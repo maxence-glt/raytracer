@@ -1,18 +1,14 @@
+#include <chrono>
 #include <iostream>
+#include <thread>
 #include "color.h"
 #include "vec3.h"
 #include "ray.h"
 
-double hit_sphere(const point3 &center, double radius, const ray &r) {
-    vec3 oc = center - r.orig;
-    auto a = dot(r.dir, r.dir);
-    auto b = -2.0 * dot(r.dir, oc);
-    auto c = dot(oc, oc) - radius*radius;
-    auto discriminant = b*b - 4*a*c;
-    
-    if (discriminant < 0) return -1.0;
-    return (-b - std::sqrt(discriminant)) / (2.0*a);
-}
+using std::chrono::high_resolution_clock;
+using std::chrono::duration_cast;
+using std::chrono::duration;
+using std::chrono::milliseconds;
 
 color ray_color(const ray &r) {
     auto t = hit_sphere(point3(0, 0, -1), 0.5, r);
@@ -54,6 +50,7 @@ int main() {
     auto pixel00_loc = viewport_upper_left + 0.5*(pixel_delta_u + pixel_delta_v);
 
     std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+    auto t1 = high_resolution_clock::now();
 
     for (int j = 0; j < image_height; ++j) {
         std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
@@ -67,7 +64,20 @@ int main() {
         }
     }
 
-    std::clog << "\rDone.                 \n";
+    auto t2 = high_resolution_clock::now();
+    auto ms_int = duration_cast<milliseconds>(t2 - t1);
+    std::clog << "\rFinished ray tracing in " << ms_int.count() << "ms\n";
 
     return 0;
 }
+
+
+
+
+
+
+
+
+
+
+

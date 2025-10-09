@@ -38,7 +38,11 @@ struct vec3 {
     }
 
     double length() const {
-        return std::sqrt(e[0]*e[0] + e[1]*e[1] + e[2]*e[2]);
+        return std::sqrt(lengthSquared());
+    }
+
+    double lengthSquared() const {
+        return e[0]*e[0] + e[1]*e[1] + e[2]*e[2];
     }
 };
 
