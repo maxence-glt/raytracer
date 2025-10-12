@@ -2,8 +2,6 @@
 #define VEC3_H
 
 #include <array>
-#include <cmath>
-#include <iostream>
 
 struct vec3 {
     std::array<double, 3> e;
@@ -43,6 +41,10 @@ struct vec3 {
 
     double lengthSquared() const {
         return e[0]*e[0] + e[1]*e[1] + e[2]*e[2];
+    }
+
+    static vec3 random(double min, double max) {
+        return vec3(random_double(min, max), random_double(min, max), random_double(min, max));
     }
 };
 
