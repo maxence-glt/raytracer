@@ -70,6 +70,31 @@ struct camera {
 
     int max_depth = 10;
 
+    color ray_color(const ray &r0, const hittable& world) const {
+        ray r = r0;
+        color throughput(1.0, 1.0, 1.0);
+
+        for (int depth = 0; depth < max_depth; ++depth) {
+            hit_record rec;
+            if (!world.hit(r, interval(0.001, infinity), rec))
+                break;
+
+            color attenuation;
+            if (!rec.mat->scatter(r, rec, attenuation, r))
+                return color(0.0, 0.0, 0.0);
+
+            throughput = throughput * attenuation;
+        }
+
+        vec3 unit_direction = unit_vector(r.dir);
+        auto a = 0.5*(unit_direction.y() + 1.0);
+        color lerp = (1.0 - a)*color(1.0, 1.0, 1.0) + a*color(0.3, 0.7, 1.0);
+
+        return lerp * throughput;
+    }
+
+    /*
+    OLD recursive way
     color ray_color(const ray &r, const hittable &world, int depth = 0) const {
         if (depth == max_depth)
                 return color(0, 0, 0);
@@ -88,6 +113,7 @@ struct camera {
         auto a = 0.5*(unit_direction.y() + 1.0);
         return (1.0-a)*color(1.0, 1.0, 1.0) + a*color(0.3, 0.7, 1.0);
     }
+    */
 
     ray get_ray(int i, int j) const {
         auto offset = sample_square();
