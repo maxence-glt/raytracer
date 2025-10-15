@@ -2,6 +2,7 @@
 #define CAMERA_H
 
 #include "hittable.h"
+#include "material.h"
 
 struct camera {
     double aspect_ratio = 1.0;
@@ -63,18 +64,29 @@ struct camera {
                                    - vec3(0, 0, focal_length)
                                    - viewport_u/2
                                    - viewport_v/2;
+
         pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
     }
 
-    color ray_color(const ray &r, const hittable &world) const {
+    int max_depth = 10;
+
+    color ray_color(const ray &r, const hittable &world, int depth = 0) const {
+        if (depth == max_depth)
+                return color(0, 0, 0);
+
         hit_record rec;
 
-        if (world.hit(r, interval(0, infinity), rec))
-            return 0.5 * (rec.normal + color(1,1,1));
+        if (world.hit(r, interval(0.001, infinity), rec)) {
+            ray scattered;
+            color attenuation;
+            if (rec.mat->scatter(r, rec, attenuation, scattered))
+                return attenuation * ray_color(scattered, world, depth + 1);
+            return color(0,0,0);
+        }
 
         vec3 unit_direction = unit_vector(r.dir);
         auto a = 0.5*(unit_direction.y() + 1.0);
-        return (1.0-a)*color(1.0, 1.0, 1.0) + a*color(0.5, 0.7, 1.0);
+        return (1.0-a)*color(1.0, 1.0, 1.0) + a*color(0.3, 0.7, 1.0);
     }
 
     ray get_ray(int i, int j) const {
@@ -82,9 +94,8 @@ struct camera {
         auto pixel_sample = pixel00_loc
                             + ((i + offset.x()) * pixel_delta_u)
                             + ((j + offset.y()) * pixel_delta_v);
-        auto ray_origin = center;
-        auto ray_dir = pixel_sample - ray_origin;
-        return ray(ray_origin, ray_dir);
+        auto ray_dir = pixel_sample - center;
+        return ray(center, ray_dir);
     }
 
     vec3 sample_square() const {
