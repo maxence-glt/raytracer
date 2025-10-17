@@ -43,3 +43,4 @@
 *.ppm
 *dsym*
 .DS_Store
+images/

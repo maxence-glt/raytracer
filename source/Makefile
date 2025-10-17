@@ -12,5 +12,5 @@ clean:
 OUT ?= image.ppm
 
 run: $(PROGRAM_NAME)
-	./$(PROGRAM_NAME) $(ARGS) > "$(OUT)"
-	kitten icat "$(OUT)"
+	./$(PROGRAM_NAME) $(ARGS) > ../images/"$(OUT)"
+	kitten icat ../images/"$(OUT)"

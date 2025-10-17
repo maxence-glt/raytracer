@@ -1,0 +1,3 @@
+Light is the motion of electrically charged particles such as electrons in a light bulb’s filament produces a disturbance of a surrounding _electric field_ that propagates away from the source. The electric oscillation also causes a secondary oscillation of the _magnetic field_, which in turn reinforces an oscillation of the electric field, and so on. The interplay of these two fields leads to a self-propagating wave that can travel extremely large distances: millions of light years, in the case of distant stars visible in a clear night sky.
+
+Detailed wave-level simulations of anything larger than a few micrometers are impractical. This leads to a more efficient computational approach based on a key operation known as [[Raytracing]].
