@@ -8,3 +8,9 @@ The components of a raytracer:
 - [[Light scattering at surfaces]]
 - [[Indirect light transport]]
 - [[Ray propagation]]
+
+Full ray tracers ar econceptually divided into three phases of execution. 
+1. Parses the scene description file provided by the user. 
+2. Creates specific objects corresponding to the scene.
+3. Main rendering loop executes (majority of running time)
+[[Initial parsing]]

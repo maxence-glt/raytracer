@@ -1,1 +1,3 @@
 Each object must provide a description of its appearance, including information about how light interacts with the object’s surface, as well as the nature of the reradiated (or _scattered_) light. Models for surface scattering are typically parameterized so that they can simulate a variety of appearances.
+
+Each object in the scene provides a _material_, which is a description of its appearance properties at each point on the surface. This description is given by the [[bidirectional reflectance distribution function]]
