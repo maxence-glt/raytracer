@@ -1,4 +1,5 @@
-A technique for variance reduction based on the careful placement of samples in order to better capture the features of the integrand (or, more accurately, to be less likely to miss important features).
+A technique for variance reduction for [[Monte Carlo Integration|monte carlo]] methods. 
+Careful placement of samples are used in order to better capture the features of the integrand (or, more accurately, to be less likely to miss important features).
 
 Stratified sampling decomposes the integration domain into regions and places samples in each one.
 
@@ -10,9 +11,5 @@ To draw samples from $\Lambda$, we will draw $n_i$ samples from each $\Lambda_i$
 - A simple example is **_supersampling_** a pixel. With stratified sampling, the area around a pixel is divided into a grid $k \times k$, and a sample is drawn uniformly within each grid cell. This is better than taking $k^2$ random samples, since the sample locations are less likely to clump together.
 
 ##### Why does this technique reduce variance?
-Within a single stratum $\Lambda_i$, the [[Monte Carlo Integration|monte carlo]] estimate is
-
-
-
-
+https://en.wikipedia.org/wiki/Variance_reduction
 

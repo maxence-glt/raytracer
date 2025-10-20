@@ -25,3 +25,4 @@ $\huge F_n = \frac{1}{n}\sum_{i=1}^{n} \frac{f(X_i)}{p(X_i)}$
 ### Improving Efficiency
 
 [[Stratified Sampling]]
+[[Importance Sampling]]
