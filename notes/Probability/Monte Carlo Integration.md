@@ -29,5 +29,6 @@ For example, if you just shoot one ray into the scene per pixel, you'll get hard
 
 [[Stratified Sampling]]
 [[Importance Sampling]]
-While [[Russian Roulette]] reduces the number of samples, [[Splitting]] improves efficiency.
+[[Russian Roulette]] (reduces the number of samples)
+[[Splitting]] (improves efficiency)
 [[Inversion Transform Sampling]]
