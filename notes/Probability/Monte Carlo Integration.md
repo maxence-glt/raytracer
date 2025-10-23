@@ -22,7 +22,12 @@ The restriction to uniform random variables can be relaxed with a small generali
 
 $\huge F_n = \frac{1}{n}\sum_{i=1}^{n} \frac{f(X_i)}{p(X_i)}$
 
-### Improving Efficiency
+### Sampling techniques
+Sampling is about selecting units out of some population of interest to make some statement about the whole. 
+
+For example, if you just shoot one ray into the scene per pixel, you'll get hard edges around object boundaries (aliasing). That's because the sampling rate isn't high enough. Instead, you can shoot multiple rays per pixel, into slightly different directions, and average them. That's also analogous to what supersampling anti-aliasing in video games does, although in raytracing we usually include some randomness in the ray directions to arrive at a better result with fewer rays.
 
 [[Stratified Sampling]]
 [[Importance Sampling]]
+While [[Russian Roulette]] reduces the number of samples, [[Splitting]] improves efficiency.
+[[Inversion Transform Sampling]]

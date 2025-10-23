@@ -22,3 +22,6 @@ $$
 1. A narrow Gaussian function that is close to zero over most of the range $[0, 1]$. The basic Monte Carlo estimator of Equation has relatively high variance if it is used to integrate this function, since most samples have values that are close to zero. 
 2. A PDF that roughly approximates the function’s distribution. If this PDF is used to generate samples, variance is reduced substantially. 
 3. A representative distribution of samples generated according to (2)
+
+## Multiple Importance Sampling
+TODO, read book i'm not this advanced yet
