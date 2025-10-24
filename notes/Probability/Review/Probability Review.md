@@ -1,5 +1,15 @@
 [PBRT  - Stats](https://www.pbr-book.org/4ed/Monte_Carlo_Integration/Monte_Carlo_Basics)
 
+I'm using this as a combination of review for the raytracer, my class notes, and prep for a QT onsite :P
+
+***Probability*** is a real-values set function *P* that assigns, to each event *A* in the sample space *S*, a number *P(A)*, called the probability of the event A, such that the following properties are satisfied:
+1. $P(A)\geq0$
+2. $P(S)=1$
+3. If events  A1, A2,… are **mutually exclusive** (no overlaps), then the probability of “any of them occurring” equals the **sum of their probabilities**
+
+[[Probability Theorems]]
+[[Bayes' Theorem]]
+
 A **_random variable_** $X$ is a value chosen by some random process. 
 Random variables are always drawn from some domain
 
