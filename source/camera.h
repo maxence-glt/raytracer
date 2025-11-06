@@ -5,6 +5,8 @@
 #include "main.h"
 #include "material.h"
 #include "vec3.h"
+#include "timing.h"
+#include "util.h"
 
 struct camera {
     double aspect_ratio = 1.0;
@@ -42,7 +44,7 @@ struct camera {
         initialize();
 
         std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
-        auto t1 = high_resolution_clock::now();
+        auto t1 = curr_time();
 
         for (int j = 0; j < image_height; ++j) {
             std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
@@ -56,8 +58,8 @@ struct camera {
             }
         }
 
-        auto t2 = high_resolution_clock::now();
-        auto ms_int = duration_cast<milliseconds>(t2 - t1);
+        auto t2 = curr_time();
+        auto ms_int = diff_time<milliseconds>(t1, t2);
         std::clog << "\rFinished ray tracing in " << ms_int.count() << "ms\n";
     }
 

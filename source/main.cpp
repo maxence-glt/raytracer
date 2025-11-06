@@ -1,69 +1,81 @@
-#include "main.h"
+#include "integrations.hpp"
+#include "worlds.hpp"
+#include <cmath>
+#include <cstdlib>
+#include <functional>
+#include "timing.h"
+#include <iomanip>
+#include <iostream>
 
-#include "camera.h"
-#include "hittable_list.h"
-#include "sphere.h"
-#include "material.h"
-
-int main() {
-    hittable_list world;
-
-    auto ground_material = std::make_shared<lambertian>(color(0.5, 0.5, 0.5));
-    world.add(std::make_shared<sphere>(point3(0,-1000,0), 1000, ground_material));
-
-    for (int a = -11; a < 11; a++) {
-        for (int b = -11; b < 11; b++) {
-            auto choose_mat = random_double();
-            point3 center(a + 0.9*random_double(), 0.2, b + 0.9*random_double());
-
-            if ((center - point3(4, 0.2, 0)).length() > 0.9) {
-                shared_ptr<material> sphere_material;
-
-                if (choose_mat < 0.8) {
-                    // diffuse
-                    auto albedo = color::random() * color::random();
-                    sphere_material = std::make_shared<lambertian>(albedo);
-                    world.add(std::make_shared<sphere>(center, 0.2, sphere_material));
-                } else if (choose_mat < 0.95) {
-                    // metal
-                    auto albedo = color::random(0.5, 1);
-                    auto fuzz = random_double(0, 0.5);
-                    sphere_material = std::make_shared<metal>(albedo, fuzz);
-                    world.add(std::make_shared<sphere>(center, 0.2, sphere_material));
-                } else {
-                    // glass
-                    sphere_material = std::make_shared<dielectric>(1.5);
-                    world.add(std::make_shared<sphere>(center, 0.2, sphere_material));
-                }
-            }
-        }
+int clear_icache() {
+    long long out = 0;
+    const size_t bigger_than_cachesize = 10 * 1024 * 1024;
+    long *p = new long[bigger_than_cachesize];
+    for(int i = 0; i < bigger_than_cachesize; i++) {
+        p[i] = rand();
     }
 
-    auto material1 = std::make_shared<dielectric>(1.5);
-    world.add(std::make_shared<sphere>(point3(0, 1, 0), 1.0, material1));
+    for(int i = 0; i < bigger_than_cachesize; i++) {
+        out += p[i];
+    }
 
-    auto material2 = std::make_shared<lambertian>(color(0.4, 0.2, 0.1));
-    world.add(std::make_shared<sphere>(point3(-4, 1, 0), 1.0, material2));
+    delete[] p;
+    return out;
+}
 
-    auto material3 = std::make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
-    world.add(std::make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
+template <typename T, typename Time, typename... Targs>
+void test_perf(std::function<T> func, int k, Targs... args) {
+    Time numerator{};
 
-    camera cam;
+    auto t1 = curr_time();
+    for (int i = 0; i < k; ++i) {
+        func(args...);
+    }
+    auto t2 = curr_time();
+    numerator = diff_time<Time>(t1, t2);
 
-    cam.aspect_ratio      = 16.0 / 9.0;
-    cam.image_width       = 400;
-    cam.samples_per_pixel = 100;
-    cam.max_depth         = 50;
+    auto denominator = (Time)k;
 
-    cam.vfov     = 20;
-    cam.lookfrom = point3(13,2,3);
-    cam.lookat   = point3(0,0,0);
-    cam.vup      = vec3(0,1,0);
+    std::cout << "Average time: " << numerator.count() / denominator.count() << '\n';
+}
 
-    cam.defocus_angle = 0.6;
-    cam.focus_dist    = 10.0;
+int main() {
+    // std::function<int(int)> fac = [&](int n) {return (n < 2) ? 1 : n * fac(n - 1); };
+    std::function<int(int)> fib = [&](int n) {return (n < 2) ? 1 : fib(n - 2) + fib(n - 1); };
 
-    cam.render(world);
+    int depth = 10;
+    using tick = nanoseconds;
+
+    auto samples{1000000};
+    auto lower{0};
+    auto upper{5};
+    auto func = [](double x) { return pow(x, 2) + pow(x, 3) - exp(-x); };
+    auto funcStr = "x^2 + x^3 - e^-x";
+
+    auto t1 = curr_time();
+    auto monte_res = test_integrator(monte_carlo, func, lower, upper, samples); 
+    auto t2 = curr_time();
+    auto diff1 = diff_time<tick>(t1, t2);
+
+    auto t3 = curr_time();
+    auto trapezoidal_res = test_integrator(trapezoidal, func, lower, upper, samples); 
+    auto t4 = curr_time();
+    auto diff2 = diff_time<tick>(t3, t4);
+
+    std::cout << "Monte carlo from " << lower << " to " 
+              << upper << " of " << funcStr << " with " << samples << " samples: "
+              << std::setprecision(10) << monte_res << "\t time: " 
+              << diff1.count() << "ns\n";
+
+    std::cout << "Trapezoidal from " << lower << " to "
+              << upper << " of " << funcStr << " with " << samples << " samples: " 
+              << std::setprecision(10) << trapezoidal_res << "\t time: " 
+              << diff2.count() << "ns\n";
+
+    std::cout << "Time difference 1" << diff1.count() - diff2.count() << '\n';
+
+    auto p = variance_test(monte_carlo, func, lower, upper, 1000000, 100, trapezoidal_res);
+    std::cout << p.first << ' ' << p.second;
 
     return 0;
 }

@@ -1,5 +1,4 @@
-#ifndef INTERVAL_H
-#define INTERVAL_H
+#pragma once
 
 struct interval {
     double min, max;
@@ -31,5 +30,3 @@ struct interval {
 
 const interval interval::empty = interval(+infinity, -infinity);
 const interval interval::universe = interval(-infinity, +infinity);
-
-#endif
