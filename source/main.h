@@ -1,5 +1,4 @@
-#ifndef MAIN_H
-#define MAIN_H
+#pragma once
 
 #include <cmath>
 #include <cstdlib>
@@ -34,5 +33,3 @@ inline double random_double(double min, double max) {
 #include "interval.h"
 #include "ray.h"
 #include "vec3.h"
-
-#endif

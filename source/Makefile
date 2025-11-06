@@ -1,13 +1,21 @@
 PROGRAM_NAME = compiledCode
-CPPFLAGS = -std=c++23 -O3 -march=native # -Weverything -Wno-c++98-compat -Wno-c++98-compat -Wno-c++98-compat-pedantic
+CXX = clang++
+CXXFLAGS = -std=c++23 -O3 -march=native
+CPPFLAGS = -MMD -MP
 
-$(PROGRAM_NAME): main.cpp
-	clang++ $(CPPFLAGS) -o $(PROGRAM_NAME) main.cpp worlds.cpp integrations.cpp
+SRCS := main.cpp worlds.cpp integrations.cpp util/vecmath.cpp
+OBJS := $(SRCS:.cpp=.o)
+DEPS := $(OBJS:.o=.d)
 
-.PHONY: clean run
+$(PROGRAM_NAME): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+.PHONY: clean run render
 clean:
-	rm -rf *.o *.dSYM $(PROGRAM_NAME)
+	rm -rf $(OBJS) $(DEPS) *.dSYM $(PROGRAM_NAME)
 
 OUT ?= image.ppm
 
@@ -17,3 +25,5 @@ run: $(PROGRAM_NAME)
 render: $(PROGRAM_NAME)
 	./$(PROGRAM_NAME) $(ARGS) > ../images/"$(OUT)"
 	kitten icat ../images/"$(OUT)"
+
+-include $(DEPS)

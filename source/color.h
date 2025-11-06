@@ -1,5 +1,4 @@
-#ifndef COLOR_H
-#define COLOR_H
+#pragma once
 
 #include "interval.h"
 #include "vec3.h"
@@ -11,7 +10,7 @@ inline double linear_to_gamma(double linear_component) {
     return 0;
 }
 
-void write_color(std::ostream &out, const color &pixel_color) {
+inline void write_color(std::ostream &out, const color &pixel_color) {
     auto r = pixel_color.e[0];
     auto g = pixel_color.e[1];
     auto b = pixel_color.e[2];
@@ -27,5 +26,3 @@ void write_color(std::ostream &out, const color &pixel_color) {
 
     out << rbyte << ' ' << gbyte << ' ' << bbyte << '\n';
 }
-
-#endif
