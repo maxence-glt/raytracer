@@ -48,3 +48,4 @@ logs/
 .obsidian/
 compiledCode
 source/.cache/
+source/compile_commands.json
