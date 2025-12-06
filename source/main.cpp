@@ -1,5 +1,5 @@
 #include "integrations.hpp"
-#include "timing.h"
+#include "util/timing.hpp"
 #include "worlds.hpp"
 #include "util/vecmath.hpp"
 #include "util/error.hpp"
@@ -60,12 +60,12 @@ int main() {
     std::cout << diff_time<nanoseconds>(r1, r2).count();
     */
 
-    //many_balls();
-    
-    warning("{} {}", "test", 1);
-    error(new FileLoc(__FILE__, __LINE__, 4), "{} {}", "test", 2);
-    errorExit("{} {}", "test", 3);
-    std::print("{} {}", 1, 2);
+    initLogging(LogLevel::Verbose, "manyBalls", true);
+    LOG_VERBOSE("Starting raytracing:");
+    many_balls();
+    //testErrors();
+
+    LOG_VERBOSE("Finished render succesfully, shutting down logging\n\n******************************************************\n\n");
 
     return 0;
 }

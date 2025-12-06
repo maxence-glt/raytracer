@@ -4,14 +4,15 @@ The $r^{th}$ **moment** of a random variable $X$ is $E[X^{r}]$
 - Also called the **moment about the origin** or the **raw moment**
 
 The $r^{th}$ **central moment** of a [[random variables|random variable]] $X$ is the expected value of the $R^{th}$ power of the deviation of a random variable from its mean $E[(X-\mu_X)^r]$
+- Also called the **moment about the mean**
 
 ![[Pasted image 20251023230410.png]]
 
 ### Moment Generating Function
 Let $X$ be a [[Random Variables|discrete random variable]] with [[Probability Mass Function|PMF]] $f(x)$ and space $S$. If there is a positive number $h$ such that 
-$$E(^{tX})=\sum_{x\in S}e^{tx}f(x)$$
+$$E(e^{tX})=\sum_{x\in S}e^{tx}f(x)$$
 exists and is finite for $-h<t<h$, then the function defined by
-$$M(t)=E(e^tX)$$
+$$M(t)=E(e^{tX})$$
 is called the **moment-generating function (MGF)** of $X$ (or of the distribution of $X$)
 
 >**Example**

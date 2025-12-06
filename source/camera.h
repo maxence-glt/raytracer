@@ -5,8 +5,8 @@
 #include "main.h"
 #include "material.h"
 #include "vec3.h"
-#include "timing.h"
-#include "util.h"
+#include "util/timing.hpp"
+#include "util/log.hpp"
 
 struct camera {
     double aspect_ratio = 1.0;
@@ -48,6 +48,7 @@ struct camera {
 
         for (int j = 0; j < image_height; ++j) {
             std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
+
             for (int i = 0; i < image_width; ++i) {
                 color pixel_color(0, 0, 0);
                 for (int sample = 0; sample < samples_per_pixel; ++sample) {
@@ -61,6 +62,7 @@ struct camera {
         auto t2 = curr_time();
         auto ms_int = diff_time<milliseconds>(t1, t2);
         std::clog << "\rFinished ray tracing in " << ms_int.count() << "ms\n";
+        LOG_VERBOSE("Finished ray tracing in {}ms", ms_int.count());
     }
 
     void initialize() {

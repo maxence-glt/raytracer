@@ -10,7 +10,7 @@
    "-c",
    "main.cpp",
    "-o",
-   "main.o"
+   "../build/main.o"
   ],
   "file": "main.cpp"
  },
@@ -25,7 +25,7 @@
    "-c",
    "worlds.cpp",
    "-o",
-   "worlds.o"
+   "../build/worlds.o"
   ],
   "file": "worlds.cpp"
  },
@@ -40,7 +40,7 @@
    "-c",
    "integrations.cpp",
    "-o",
-   "integrations.o"
+   "../build/integrations.o"
   ],
   "file": "integrations.cpp"
  },
@@ -55,7 +55,7 @@
    "-c",
    "util/vecmath.cpp",
    "-o",
-   "util/vecmath.o"
+   "../build/util/vecmath.o"
   ],
   "file": "util/vecmath.cpp"
  },
@@ -70,8 +70,23 @@
    "-c",
    "util/error.cpp",
    "-o",
-   "util/error.o"
+   "../build/util/error.o"
   ],
   "file": "util/error.cpp"
+ },
+ {
+  "directory": "/Users/maxencegilloteaux/ComputerScience/Personal/Projects/raytracer/source",
+  "arguments": [
+   "/opt/homebrew/opt/llvm/bin/clang++",
+   "-std=c++23",
+   "-O3",
+   "-MMD",
+   "-MP",
+   "-c",
+   "util/log.cpp",
+   "-o",
+   "../build/util/log.o"
+  ],
+  "file": "util/log.cpp"
  }
 ]

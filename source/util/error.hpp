@@ -59,3 +59,4 @@ template <typename... Args>
 
 int lastError();
 std::string errorString(int errorId = lastError());
+void testErrors();

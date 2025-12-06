@@ -2,6 +2,7 @@
 #include <format>
 
 #include "error.hpp"
+#include "log.hpp"
 
 static bool quiet = false;
 
@@ -25,7 +26,7 @@ static void processError(const char *errorType, const FileLoc *loc, const char *
     // Build up an entire formatted error string and print it all at once;
     // this way, if multiple threads are printing messages at once, they
     // don't get jumbled up...
-    std::string errorString = red(errorType);
+    std::string errorString;
 
     if (loc)
         errorString += ": " + loc->toString();
@@ -36,8 +37,8 @@ static void processError(const char *errorType, const FileLoc *loc, const char *
     // Print the error message (but not more than one time).
     static std::string lastError;
     if (errorString != lastError) {
-        std::print(stderr, "{}\n", errorString.c_str());
-        //LOG_VERBOSE("%s", errorString);
+        std::print(stderr, "{}\n", red(errorType) + errorString);
+        LOG_VERBOSE("{}", errorType + errorString);
         lastError = errorString;
     }
 }
@@ -55,7 +56,7 @@ void error(const FileLoc *loc, const char *message) {
 }
 
 void errorExit(const FileLoc *loc, const char *message) {
-    processError("Error", loc, message);
+    processError("Fatal Error", loc, message);
     exit(1);
 }
 
@@ -65,4 +66,25 @@ int lastError() {
 
 std::string errorString(int errorId) {
     return std::format("{} ({})", strerror(errorId), errorId);
+}
+
+void testErrors() {
+    warning("warning (no loc): {} {}", "test", 1);
+
+    FileLoc wloc(__FILE__, __LINE__, 10);
+    warning(&wloc, "warning (with loc): file='{}' line={} col={}",
+            wloc.filename, wloc.line, wloc.column);
+
+    error("error (no loc): {} {}", "test", 2);
+
+    FileLoc eloc(__FILE__, __LINE__, 20);
+    error(&eloc, "error (with loc): file='{}' line={} col={}",
+          eloc.filename, eloc.line, eloc.column);
+
+    //errorExit("fatal error (no loc): {} {}", "test", 3);
+
+    /*
+    errorExit(&eloc,
+              "fatal error (with loc): file='{}' line={} col={}", eloc.filename, eloc.line, eloc.column);
+    */
 }

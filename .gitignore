@@ -44,5 +44,7 @@
 *dsym*
 .DS_Store
 images/
+logs/
 .obsidian/
 compiledCode
+source/.cache/

@@ -1,4 +1,5 @@
 [PBRT  - Stats](https://www.pbr-book.org/4ed/Monte_Carlo_Integration/Monte_Carlo_Basics)
+[[Notation and Theory]]
 
 I'm using this as a combination of review for the raytracer, my class notes, and prep for a QT onsite :P
 
