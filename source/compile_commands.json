@@ -1,0 +1,77 @@
+[
+ {
+  "directory": "/Users/maxencegilloteaux/ComputerScience/Personal/Projects/raytracer/source",
+  "arguments": [
+   "/opt/homebrew/opt/llvm/bin/clang++",
+   "-std=c++23",
+   "-O3",
+   "-MMD",
+   "-MP",
+   "-c",
+   "main.cpp",
+   "-o",
+   "main.o"
+  ],
+  "file": "main.cpp"
+ },
+ {
+  "directory": "/Users/maxencegilloteaux/ComputerScience/Personal/Projects/raytracer/source",
+  "arguments": [
+   "/opt/homebrew/opt/llvm/bin/clang++",
+   "-std=c++23",
+   "-O3",
+   "-MMD",
+   "-MP",
+   "-c",
+   "worlds.cpp",
+   "-o",
+   "worlds.o"
+  ],
+  "file": "worlds.cpp"
+ },
+ {
+  "directory": "/Users/maxencegilloteaux/ComputerScience/Personal/Projects/raytracer/source",
+  "arguments": [
+   "/opt/homebrew/opt/llvm/bin/clang++",
+   "-std=c++23",
+   "-O3",
+   "-MMD",
+   "-MP",
+   "-c",
+   "integrations.cpp",
+   "-o",
+   "integrations.o"
+  ],
+  "file": "integrations.cpp"
+ },
+ {
+  "directory": "/Users/maxencegilloteaux/ComputerScience/Personal/Projects/raytracer/source",
+  "arguments": [
+   "/opt/homebrew/opt/llvm/bin/clang++",
+   "-std=c++23",
+   "-O3",
+   "-MMD",
+   "-MP",
+   "-c",
+   "util/vecmath.cpp",
+   "-o",
+   "util/vecmath.o"
+  ],
+  "file": "util/vecmath.cpp"
+ },
+ {
+  "directory": "/Users/maxencegilloteaux/ComputerScience/Personal/Projects/raytracer/source",
+  "arguments": [
+   "/opt/homebrew/opt/llvm/bin/clang++",
+   "-std=c++23",
+   "-O3",
+   "-MMD",
+   "-MP",
+   "-c",
+   "util/error.cpp",
+   "-o",
+   "util/error.o"
+  ],
+  "file": "util/error.cpp"
+ }
+]

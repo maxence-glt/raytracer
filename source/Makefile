@@ -1,9 +1,9 @@
 PROGRAM_NAME = compiledCode
-CXX = clang++
-CXXFLAGS = -std=c++23 -O3 -march=native
+CXX = /opt/homebrew/opt/llvm/bin/clang++
+CXXFLAGS = -std=c++23 -O3
 CPPFLAGS = -MMD -MP
 
-SRCS := main.cpp worlds.cpp integrations.cpp util/vecmath.cpp
+SRCS := main.cpp worlds.cpp integrations.cpp util/vecmath.cpp util/error.cpp # util/log.cpp
 OBJS := $(SRCS:.cpp=.o)
 DEPS := $(OBJS:.o=.d)
 

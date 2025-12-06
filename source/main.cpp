@@ -2,11 +2,17 @@
 #include "timing.h"
 #include "worlds.hpp"
 #include "util/vecmath.hpp"
+#include "util/error.hpp"
+#include "util/log.hpp"
+#include "util/math.hpp"
+#include <array>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
+#include <vector>
 
 int main() {
+    /*
     size_t samples{1000000};
     auto lower{0};
     auto upper{5};
@@ -34,6 +40,32 @@ int main() {
     std::cout << std::setprecision(10) << "Monte Carlo with stratified mean: "
               << p_strat.first << " and variance: " << p_strat.second
               << " in " << diff_time<milliseconds>(t5, t6).count() << '\n';
+
+    const int N = 10000000;
+    std::vector<int> arr(N, 1);
+    std::vector<int> arr2(N, 1);
+
+    volatile int total{};
+    auto f1 = curr_time();
+    for (int i = 0; i < arr.size(); ++i)
+        total += arr[i];
+    auto f2 = curr_time();
+
+    auto r1 = curr_time();
+    for (int i = arr.size() - 1; i >= 0; --i)
+        total += arr2[i];
+    auto r2 = curr_time();
+
+    std::cout << diff_time<nanoseconds>(f1, f2).count() << '\n';
+    std::cout << diff_time<nanoseconds>(r1, r2).count();
+    */
+
+    //many_balls();
+    
+    warning("{} {}", "test", 1);
+    error(new FileLoc(__FILE__, __LINE__, 4), "{} {}", "test", 2);
+    errorExit("{} {}", "test", 3);
+    std::print("{} {}", 1, 2);
 
     return 0;
 }
