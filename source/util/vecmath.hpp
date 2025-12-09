@@ -6,23 +6,7 @@ using std::isnan;
 
 /* TODO: Possible additions
 *
-* The basic arithmetic operators of per-component addition, subtraction, and negation, including the “in place” (e.g., operator+=) forms of them.
-*
-* Component-wise multiplication and division by a scalar value, including “in place” variants.
-*
-* Abs(a), which returns a value where the absolute value of each component of the tuple type has been taken.
-*
-* Ceil(a) and Floor(a), which return a value where the components have been rounded up or down to the nearest integer value, respectively.
-*
-* Lerp(t, a, b), which returns the result of the linear interpolation (1-t)*a + t*b.
-*
 * FMA(a, b, c), which takes three tuples and returns the result of a component-wise fused multiply-add a*b + c.
-*
-* Min(a, b) and Max(a, b), which respectively return the component-wise minimum and maximum of the two given tuples.
-*
-* MinComponentValue(a) and MaxComponentValue(a), which respectively return the minimum and maximum value of the tuple’s components.
-*
-* MinComponentIndex(a) and MaxComponentIndex(a), which respectively return the zero-based index of the tuple element with minimum or maximum value.
 *
 * Permute(a, perm), which returns the permutation of the tuple according to an array of indices.
 8
@@ -135,6 +119,69 @@ public:
     }
 
 };
+
+// Tuple3 Inline Functions
+template <template <class> class C, typename T, typename U>
+inline auto operator*(U s, Tuple3<C, T> t) -> C<decltype(T{} * U{})> {
+    return t * s;
+}
+
+template <template <class> class C, typename T>
+inline C<T> abs(Tuple3<C, T> t) {
+    using std::abs;
+    return {abs(t[0]), abs(t[1]), abs(t[2])};
+}
+
+template <template <class> class C, typename T>
+inline C<T> ceil(Tuple3<C, T> t) {
+    using std::ceil;
+    return {ceil(t[0]), ceil(t[1]), ceil(t[2])};
+}
+
+template <template <class> class C, typename T>
+inline C<T> floor(Tuple3<C, T> t) {
+    using std::floor;
+    return {floor(t[0]), floor(t[1]), floor(t[2])};
+}
+
+template <template <class> class C, typename T>
+inline auto lerp(float t, Tuple3<C, T> t0, Tuple3<C, T> t1) {
+    return (1 - t) * t0 + t * t1;
+}
+
+template <template <class> class C, typename T>
+inline C<T> min(Tuple3<C, T> t1, Tuple3<C, T> t2) {
+    using std::min;
+    return {min(t1.x, t2.x), min(t1.y, t2.y), min(t1.z, t2.z)};
+}
+
+template <template <class> class C, typename T>
+inline T minComponentValue(Tuple3<C, T> t) {
+    using std::min;
+    return min({t.x, t.y, t.z});
+}
+
+template <template <class> class C, typename T>
+inline int minComponentIndex(Tuple3<C, T> t) {
+    return (t.x < t.y) ? ((t.x < t.z) ? 0 : 2) : ((t.y < t.z) ? 1 : 2);
+}
+
+template <template <class> class C, typename T>
+inline C<T> max(Tuple3<C, T> t1, Tuple3<C, T> t2) {
+    using std::max;
+    return {max(t1.x, t2.x), max(t1.y, t2.y), max(t1.z, t2.z)};
+}
+
+template <template <class> class C, typename T>
+inline T maxComponentValue(Tuple3<C, T> t) {
+    using std::max;
+    return max({t.x, t.y, t.z});
+}
+
+template <template <class> class C, typename T>
+inline int maxComponentIndex(Tuple3<C, T> t) {
+    return (t.x > t.y) ? ((t.x > t.z) ? 0 : 2) : ((t.y > t.z) ? 1 : 2);
+}
 
 template <typename T>
 class Vector3 : public Tuple3<Vector3, T> {
