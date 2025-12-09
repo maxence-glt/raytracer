@@ -5,11 +5,13 @@
 #include "util/error.hpp"
 #include "util/log.hpp"
 #include "util/math.hpp"
+#include "util/vecmath.hpp"
 #include <array>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <vector>
+#include "util/check.h"
 
 int main() {
     /*
@@ -62,8 +64,13 @@ int main() {
 
     initLogging(LogLevel::Verbose, "manyBalls", true);
     LOG_VERBOSE("Starting raytracing:");
-    many_balls();
+    //many_balls();
     //testErrors();
+
+    double n;
+    Vector3<float> t3;
+    std::cout << t3.toString();
+
 
     LOG_VERBOSE("Finished render succesfully, shutting down logging\n\n******************************************************\n\n");
 

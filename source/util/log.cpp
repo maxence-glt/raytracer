@@ -10,7 +10,7 @@ float elapsedSeconds() {
 
     timePoint now = clock::now();
     int64_t elapseduS = diff_time<milliseconds>(start, now).count();
-    return elapseduS / 1000000.;
+    return elapseduS / 1e3;
 }
 
 namespace logging {
@@ -67,6 +67,7 @@ void log(LogLevel level, const char *file, int line, const char *s) {
     int len = strlen(s);
     if (len == 0)
         return;
+
     std::string levelString = (level == LogLevel::Verbose) ? "" : (toString(level) + " ");
 
     if (logging::logFile) {
