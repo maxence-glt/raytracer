@@ -31,7 +31,7 @@ $(PROGRAM_NAME): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 $(TEST_PROGRAM): $(filter-out $(BUILD_DIR)/main.o,$(OBJS)) $(TEST_OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $^ $(GTEST_LIBS)
+	$(CXX) $(CXXFLAGS_DEBUG) -o $@ $^ $(GTEST_LIBS)
 
 $(BUILD_DIR)/%.o: %.cpp
 	@mkdir -p $(dir $@)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "check.h"
+#include "math.hpp"
 
 using std::isnan;
 
@@ -12,6 +13,15 @@ using std::isnan;
 8
 * HProd(a), which returns the horizontal product—the component values multiplied together. 
 */
+
+template <typename T>
+struct TupleLength { using type = float; };
+
+template <>
+struct TupleLength<double> { using type = double; };
+
+template <>
+struct TupleLength<long double> { using type = long double; };
 
 template <template <typename> class Child, typename T>
 class Tuple3 {
@@ -208,3 +218,60 @@ public:
 
 using Vector3f = Vector3<float>;
 using Vector3i = Vector3<int>;
+
+template <typename T>
+inline T lengthSquared(Vector3<T> v) { return v.x*v.x + v.y*v.y + v.z*v.z; }
+
+template <typename T>
+inline auto length(Vector3<T> v) -> typename TupleLength<T>::type {
+    using std::sqrt;
+    return sqrt(lengthSquared(v));
+}
+
+template <typename T>
+inline auto normalize(Vector3<T> v) { return v / length(v); };
+
+template <typename T>
+inline T dot(Vector3<T> v, Vector3<T> w) {
+    return v.x*w.x + v.y*w.y + v.z*w.z;
+}
+
+template <typename T>
+inline float angleBetween(Vector3<T> v1, Vector3<T> v2) {
+    if (dot(v1, v2) < 0)
+        return Pi - 2 * safeASin(length(v1 + v2) / 2);
+    else
+        return 2 * safeASin(length(v2 - v1) / 2);
+}
+
+template <typename T>
+inline Vector3<T> GramSchmidt(Vector3<T> v, Vector3<T> w) {
+    return v - dot(v, w) * w;
+}
+
+template <typename T>
+inline Vector3<T> Cross(Vector3<T> v, Vector3<T> w) {
+    return {DifferenceOfProducts(v.y, w.z, v.z, w.y),
+            DifferenceOfProducts(v.z, w.x, v.x, w.z),
+            DifferenceOfProducts(v.x, w.y, v.y, w.x)};
+}
+
+template <typename T>
+inline void CoordinateSystem(Vector3<T> v1, Vector3<T> *v2, Vector3<T> *v3) {
+    float sign = std::copysign(1.0, v1.z);
+    float a = -1 / (sign + v1.z);
+    float b = v1.x * v1.y * a;
+    *v2 = Vector3<T>(1 + sign * (v1.x*v1.x) * a, sign * b, -sign * v1.x);
+    *v3 = Vector3<T>(b, sign + (v1.y*v1.y) * a, -v1.y);
+}
+
+template <typename T>
+class Point3 : public Tuple3<Point3, T> {
+
+};
+
+template <typename T>
+class Normal3 : public Tuple3<Normal3, T> {
+
+};
+
