@@ -67,9 +67,11 @@ int main() {
     //many_balls();
     //testErrors();
 
-    double n;
-    Vector3<float> t3;
-    std::cout << t3.toString();
+    Vector3i p1(1, 2, 3);
+    Vector3i p2(4, 5,  6);
+    auto p3 = dot(p1, p2);
+
+    std::cout << p3;
 
 
     LOG_VERBOSE("Finished render succesfully, shutting down logging\n\n******************************************************\n\n");

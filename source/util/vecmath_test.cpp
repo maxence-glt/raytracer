@@ -27,12 +27,6 @@ TEST(Vector3, Basics) {
     EXPECT_EQ(1, minComponentIndex(-vf));
     EXPECT_EQ(Vector3<float>(-1/sqrt(105), 10/sqrt(105), 2/sqrt(105)),
               normalize(vf));
-    /*
-    EXPECT_EQ(vf, Permute(vf, {0, 1, 2}));
-    EXPECT_EQ(Vector3f(10, -1, 2), Permute(vf, {1, 0, 2}));
-    EXPECT_EQ(Vector3f(2, -1, 10), Permute(vf, {2, 0, 1}));
-    EXPECT_EQ(Vector3f(10, 10, -1), Permute(vf, {1, 1, 0}));
-    */
 }
 
 TEST(Vector, AngleBetween) {
@@ -134,4 +128,51 @@ TEST(Vector, CoordinateSystem) {
         CoordinateSystem(v, &a, &b);
         EXPECT_LT(error(v, a, b), 1e-10);
     }
+}
+
+TEST(Point3, Basics) {
+    Point3f p(-1, 10, 2);
+
+    EXPECT_EQ(p, Point3f(Point3i(-1, 10, 2)));
+    EXPECT_EQ(p, Point3f(Vector3f(-1, 10, 2)));
+    EXPECT_EQ(Point3f(1, -10, -2), -p);
+
+    Vector3f v(1, 2, 3);
+    EXPECT_EQ(Point3f(0, 12, 5), p + v);
+
+    Point3f p2 = p;
+    p2 += v;
+    EXPECT_EQ(Point3f(0, 12, 5), p2);
+    EXPECT_EQ(Point3f(-2, 8, -1), p - v);
+
+    p2 = p;
+    p2 -= v;
+    EXPECT_EQ(Point3f(-2, 8, -1), p2);
+
+    Point3f q(0, 12, 5);
+    EXPECT_EQ(Vector3f(1, 2, 3), q - p);
+
+    Point3i pi(-1, 10, 2);
+    auto mixedDiff = q - pi;
+    EXPECT_EQ(Vector3f(1, 2, 3), mixedDiff);
+}
+
+TEST(Point3, Distance) {
+    Point3f a(1, 2, 3);
+    Point3f b(4, 6, 3);
+
+    EXPECT_FLOAT_EQ(5.f, distance(a, b));
+    EXPECT_FLOAT_EQ(25.f, distanceSquared(a, b));
+    EXPECT_FLOAT_EQ(distance(a, b), distance(b, a));
+    EXPECT_FLOAT_EQ(distanceSquared(a, b), distanceSquared(b, a));
+    EXPECT_FLOAT_EQ(0.f, distance(a, a));
+    EXPECT_FLOAT_EQ(0.f, distanceSquared(a, a));
+}
+
+
+TEST(Normal3, Basics) {
+    Vector3f a(1, 2, 3);
+    Vector3f b(4, 5, 6);
+    Normal3f n = Normal3f(cross(a, b));
+    EXPECT_EQ(n, Normal3f(-3, 6, -3));
 }

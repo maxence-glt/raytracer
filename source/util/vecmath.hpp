@@ -2,6 +2,7 @@
 
 #include "check.h"
 #include "math.hpp"
+#include <__ostream/print.h>
 
 using std::isnan;
 
@@ -13,6 +14,13 @@ using std::isnan;
 8
 * HProd(a), which returns the horizontal product—the component values multiplied together. 
 */
+
+template <typename T>
+class Vector3;
+template <typename T>
+class Point3;
+template <typename T>
+class Normal3;
 
 template <typename T>
 struct TupleLength { using type = float; };
@@ -33,14 +41,14 @@ public:
     Tuple3(T x, T y, T z) : x(x), y(y), z(z) { DCHECK(!hasNaN()); }
 
     Tuple3(Child<T> c) {
-        DCHECK(!c.HasNaN());
+        DCHECK(!c.hasNaN());
         x = c.x;
         y = c.y;
         z = c.z;
     }
 
     Child<T> &operator=(Child<T> c) {
-        DCHECK(!c.HasNaN());
+        DCHECK(!c.hasNaN());
         x = c.x;
         y = c.y;
         z = c.z;
@@ -50,12 +58,14 @@ public:
     bool hasNaN() const { return isnan(x) || isnan(y) || isnan(z); }
 
     T operator[](int i) const {
+        DCHECK(i >= 0 && i <= 2);
         if (i == 0) return x;
         if (i == 1) return y;
         return z;
     }
 
     T &operator[](int i) {
+        DCHECK(i >= 0 && i <= 2);
         if (i == 0) return x;
         if (i == 1) return y;
         return z;
@@ -63,6 +73,7 @@ public:
 
     template <typename U>
     auto operator+(Child<U> c) const -> Child<decltype(T{} + U{})> {
+        DCHECK(!c.hasNaN());
         return {x + c.x, y + c.y, z + c.z};
     }
 
@@ -207,14 +218,17 @@ public:
     explicit Vector3(Vector3<U> v)
     : Tuple3<Vector3, T>(T(v.x), T(v.y), T(v.z)) {}
 
-    /*
     template <typename U>
     explicit Vector3(Point3<U> p);
 
     template <typename U>
     explicit Vector3(Normal3<U> n);
-    */
 };
+
+template <typename T>
+template <typename U>
+Vector3<T>::Vector3(Point3<U> p) : Tuple3<Vector3, T>(T(p.x), T(p.y), T(p.z)) {}
+
 
 using Vector3f = Vector3<float>;
 using Vector3i = Vector3<int>;
@@ -233,6 +247,7 @@ inline auto normalize(Vector3<T> v) { return v / length(v); };
 
 template <typename T>
 inline T dot(Vector3<T> v, Vector3<T> w) {
+    DCHECK(!v1.hasNaN() && !v2.hasNaN());
     return v.x*w.x + v.y*w.y + v.z*w.z;
 }
 
@@ -245,12 +260,12 @@ inline float angleBetween(Vector3<T> v1, Vector3<T> v2) {
 }
 
 template <typename T>
-inline Vector3<T> GramSchmidt(Vector3<T> v, Vector3<T> w) {
+inline Vector3<T> gramSchmidt(Vector3<T> v, Vector3<T> w) {
     return v - dot(v, w) * w;
 }
 
 template <typename T>
-inline Vector3<T> Cross(Vector3<T> v, Vector3<T> w) {
+inline Vector3<T> cross(Vector3<T> v, Vector3<T> w) {
     return {DifferenceOfProducts(v.y, w.z, v.z, w.y),
             DifferenceOfProducts(v.z, w.x, v.x, w.z),
             DifferenceOfProducts(v.x, w.y, v.y, w.x)};
@@ -267,11 +282,125 @@ inline void CoordinateSystem(Vector3<T> v1, Vector3<T> *v2, Vector3<T> *v3) {
 
 template <typename T>
 class Point3 : public Tuple3<Point3, T> {
+public:
+    using Tuple3<Point3, T>::x;
+    using Tuple3<Point3, T>::y;
+    using Tuple3<Point3, T>::z;
+    using Tuple3<Point3, T>::operator+;
+    using Tuple3<Point3, T>::operator+=;
+    using Tuple3<Point3, T>::operator*;
+    using Tuple3<Point3, T>::operator*=;
 
+    Point3() = default;
+    Point3(T x, T y, T z) : Tuple3<Point3, T>(x, y, z) {}
+
+    Point3<T> operator-() const { return {-x, -y, -z}; }
+
+    template <typename U>
+    explicit Point3(Point3<U> p)
+    : Tuple3<Point3, T>(T(p.x), T(p.y), T(p.z)) {}
+
+    template <typename U>
+    explicit Point3(Vector3<U> v)
+    : Tuple3<Point3, T>(T(v.x), T(v.y), T(v.z)) {}
+
+    template <typename U>
+    auto operator+(Vector3<U> v) const -> Point3<decltype(T{} + U{})> {
+        DCHECK(!v.hasNaN());
+        return {x + v.x, y + v.y, z + v.z};
+    }
+
+    template <typename U>
+    Point3<T> &operator+=(Vector3<U> v) {
+        DCHECK(!v.hasNaN());
+        x += v.x;
+        y += v.y;
+        z += v.z;
+        return *this;
+    }
+
+    template <typename U>
+    auto operator-(Vector3<U> v) const -> Point3<decltype(T{} - U{})> {
+        DCHECK(!v.hasNaN());
+        return {x - v.x, y - v.y, z - v.z};
+    }
+
+    template <typename U>
+    Point3<T> &operator-=(Vector3<U> v) {
+        DCHECK(!v.hasNaN());
+        x -= v.x;
+        y -= v.y;
+        z -= v.z;
+        return *this;
+    }
+
+    template <typename U>
+    auto operator-(Point3<U> p) const -> Vector3<decltype(T{} - U{})> {
+        DCHECK(!p.hasNaN());
+        return {x - p.x, y - p.y, z - p.z};
+    }
 };
+
+using Point3f = Point3<float>;
+using Point3i = Point3<int>;
+
+template <typename T>
+auto distance(Point3<T> p1, Point3<T> p2) { return length(p1 - p2); }
+
+template <typename T>
+auto distanceSquared(Point3<T> p1, Point3<T> p2) {
+    return lengthSquared(p1 - p2);
+}
 
 template <typename T>
 class Normal3 : public Tuple3<Normal3, T> {
+public:
+    using Tuple3<Normal3, T>::x;
+    using Tuple3<Normal3, T>::y;
+    using Tuple3<Normal3, T>::z;
+    using Tuple3<Normal3, T>::hasNaN;
+    using Tuple3<Normal3, T>::operator+;
+    using Tuple3<Normal3, T>::operator*;
+    using Tuple3<Normal3, T>::operator*=;
 
+    Normal3() = default;
+    Normal3(T x, T y, T z) : Tuple3<Normal3, T>(x, y, z) {}
+
+    template <typename U>
+    explicit Normal3<T>(Normal3<U> v)
+    : Tuple3<Normal3, T>(T(v.x), T(v.y), T(v.z)) {}
+
+    template <typename U>
+    explicit Normal3<T>(Vector3<U> v)
+    : Tuple3<Normal3, T>(T(v.x), T(v.y), T(v.z)) {}
 };
 
+using Normal3f = Normal3<float>;
+using Normal3i = Normal3<int>;
+
+template <typename T>
+inline T dot(Normal3<T> v, Normal3<T> w) {
+    DHECK(!v.hasNaN() && !w.hasNaN());
+    return v.x*w.x + v.y*w.y + v.z*w.z;
+}
+
+template <typename T>
+inline Vector3<T> cross(Vector3<T> v1, Normal3<T> v2) {
+    DCHECK(!v1.hasNaN() && !v2.hasNaN());
+    return {differenceOfProducts(v1.y, v2.z, v1.z, v2.y),
+            differenceOfProducts(v1.z, v2.x, v1.x, v2.z),
+            differenceOfProducts(v1.x, v2.y, v1.y, v2.x)};
+}
+
+template <typename T>
+inline Vector3<T> cross(Normal3<T> v1, Vector3<T> v2) {
+    DCHECK(!v1.hasNaN() && !v2.hasNaN());
+    return {DifferenceOfProducts(v1.y, v2.z, v1.z, v2.y),
+            DifferenceOfProducts(v1.z, v2.x, v1.x, v2.z),
+            DifferenceOfProducts(v1.x, v2.y, v1.y, v2.x)};
+}
+
+template <typename T>
+Normal3<T> faceForward(Normal3<T> n, Vector3<T> v) {
+    return (dot(n, v) < 0.f) ? -n : n;
+}
