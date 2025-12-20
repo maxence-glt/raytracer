@@ -13,6 +13,7 @@ struct FileLoc {
 
 
 void suppressErrorMessages();
+void printStackTrace(FILE *out, unsigned int max_frames);
 
 // declarations
 void warning(const FileLoc *loc, const char *message);

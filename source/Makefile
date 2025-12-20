@@ -1,8 +1,11 @@
 PROGRAM_NAME = compiledCode
-CXX = /opt/homebrew/opt/llvm/bin/clang++
+CXX = clang++
 
 CXXFLAGS_RELEASE = -std=c++23 -O3
-CXXFLAGS_DEBUG   = -std=c++23 -O0 -g -DDEBUG_BUILD
+# make sure to have the right clang env variables, more at bottom
+CXXFLAGS_DEBUG   = -std=c++23 -O0 -g -DDEBUG_BUILD \
+				   -fno-omit-frame-pointer -fno-optimize-sibling-calls \
+				   -fsanitize=address,undefined,leak
 CXXFLAGS         = $(CXXFLAGS_RELEASE)
 CPPFLAGS         = -MMD -MP
 
@@ -59,3 +62,10 @@ test: $(TEST_PROGRAM)
 
 -include $(DEPS)
 
+# set your LLVM_SYMBOLIZER_PATH
+# ASan: enable symbolization + leak detection on macOS
+# set -gx ASAN_OPTIONS "detect_leaks=1:symbolize=1:abort_on_error=1:halt_on_error=1:malloc_context_size=50:verbosity=1"
+# UBSan: print stack traces
+# set -gx UBSAN_OPTIONS "print_stacktrace=1:symbolize=1:halt_on_error=1:verbosity=1"
+# LSan verbosity (optional)
+# set -gx LSAN_OPTIONS "verbosity=1"

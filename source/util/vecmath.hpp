@@ -247,7 +247,7 @@ inline auto normalize(Vector3<T> v) { return v / length(v); };
 
 template <typename T>
 inline T dot(Vector3<T> v, Vector3<T> w) {
-    DCHECK(!v1.hasNaN() && !v2.hasNaN());
+    DCHECK(!v.hasNaN() && !w.hasNaN());
     return v.x*w.x + v.y*w.y + v.z*w.z;
 }
 

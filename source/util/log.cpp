@@ -60,28 +60,31 @@ std::string toString(LogLevel level) {
     }
 }
 
-#define LOG_BASE_FMT "%9.3fs"
-#define LOG_BASE_ARGS elapsedSeconds()
-
 void log(LogLevel level, const char *file, int line, const char *s) {
-    int len = strlen(s);
-    if (len == 0)
+    if (!s || s[0] == '\0')
         return;
 
-    std::string levelString = (level == LogLevel::Verbose) ? "" : (toString(level) + " ");
+    std::string levelString;
+    if (level != LogLevel::Verbose) {
+        levelString = toString(level);
+        levelString.push_back(' ');
+    }
+
+    std::FILE* out = logging::logFile ? logging::logFile : stderr;
+
+    std::println(out,
+        "[ {} {}:{} ] {}{}",
+        elapsedSeconds(),
+        file, line,
+        levelString, s
+    );
 
     if (logging::logFile) {
-        fprintf(logging::logFile, "[ " LOG_BASE_FMT " %s:%d ] %s%s\n", LOG_BASE_ARGS,
-                file, line, levelString.c_str(), s);
-        fflush(logging::logFile);
-    } else
-        fprintf(stderr, "[ " LOG_BASE_FMT " %s:%d ] %s%s\n", LOG_BASE_ARGS,
-                file, line, levelString.c_str(), s);
+        std::fflush(out); // keep your old behavior
+    }
 }
-
 void logFatal(LogLevel level, const char *file, int line, const char *s) {
-    fprintf(stderr, "[ " LOG_BASE_FMT " %s:%d ] %s %s\n", LOG_BASE_ARGS,
-            file, line, toString(level).c_str(), s);
+    log(level, file, line, s);
 
     abort();
 }

@@ -10,8 +10,15 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
+#include <cxxabi.h>
 #include <vector>
 #include "util/check.h"
+
+int test() {
+    int *array = new int[100];
+    delete [] array;
+    return array[10];
+}
 
 int main() {
     /*
@@ -71,7 +78,9 @@ int main() {
     Vector3i p2(4, 5,  6);
     auto p3 = dot(p1, p2);
 
-    std::cout << p3;
+    std::cout << test();
+
+    error(nullptr, "test");
 
 
     LOG_VERBOSE("Finished render succesfully, shutting down logging\n\n******************************************************\n\n");

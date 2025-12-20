@@ -1,5 +1,12 @@
+#include <cstddef>
+#include <memory>
 #include <print>
 #include <format>
+#include <sstream>
+#include <vector>
+#include <execinfo.h>
+#include <cxxabi.h>
+ 
 
 #include "error.hpp"
 #include "log.hpp"
@@ -39,6 +46,8 @@ static void processError(const char *errorType, const FileLoc *loc, const char *
     if (errorString != lastError) {
         std::print(stderr, "{}\n", red(errorType) + errorString);
         LOG_VERBOSE("{}", errorType + errorString);
+        //TODO: replace with std::stacktrace when clang supports it
+        printStackTrace(stderr, 65);
         lastError = errorString;
     }
 }
@@ -88,3 +97,71 @@ void testErrors() {
               "fatal error (with loc): file='{}' line={} col={}", eloc.filename, eloc.line, eloc.column);
     */
 }
+
+std::vector<std::string> splitString(const std::string& input) {
+    std::istringstream iss(input);
+    std::vector<std::string> tokens;
+    std::string tok;
+
+    while (iss >> tok)
+        tokens.emplace_back(tok);
+
+    return tokens;
+}
+
+void printStackTrace(FILE *out = stderr, unsigned int max_frames = 10)
+{
+    std::print(out, "stack trace:\n");
+
+    std::vector<void*> addrlist(max_frames + 1);
+    size_t addrlen = backtrace(addrlist.data(), addrlist.size());
+
+    if (addrlen == 0) {
+        std::print(out, "  \n" );
+        return;
+    }
+
+    // this will allocate memory
+    char** temp = backtrace_symbols(addrlist.data(), addrlen);
+    if (!temp) {
+        std::print(out, "  <backtrace_symbols failed>\n");
+        return;
+    }
+
+    std::vector<std::string> symbollist;
+    symbollist.reserve(addrlen > 0 ? addrlen - 1 : 0);
+
+    // skip printStackTrace call
+    for (size_t i = 1; i < addrlen; ++i)
+         symbollist.emplace_back(temp[i]);
+
+    free(temp);
+
+    for (const auto &it : symbollist) {
+        auto prettySymbols = splitString(it);
+
+        if (prettySymbols.size() < 6) {
+            std::print(stderr, "prettySymbols.size() < 6 with it={}\n", it);
+            continue;
+        }
+
+        int status = 0;
+        std::unique_ptr<char, decltype(&std::free)> cxx_sname(
+            abi::__cxa_demangle(prettySymbols[3].c_str(), nullptr, 0, &status),
+            &std::free
+        );
+
+        if (!status && cxx_sname)
+            prettySymbols[3] = cxx_sname.get();
+        // ignore the errors for names that aren't mangled (errno -2)
+        else if (status != -2)
+            std::print(stderr, "__cxa_demangle failed with error={}\n", status);
+
+        std::print(out, "{:3} {:15} {:25} {} {} {}\n", 
+                   prettySymbols[0], prettySymbols[1], prettySymbols[2],
+                   prettySymbols[3], prettySymbols[4], prettySymbols[5]);
+    }
+
+    std::print("\n");
+}
+
