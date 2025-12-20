@@ -1,4 +1,3 @@
-
 Confidence intervals (CIs) all have the same general shape:
 
 $$

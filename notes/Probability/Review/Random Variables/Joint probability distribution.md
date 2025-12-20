@@ -22,6 +22,7 @@ $$
 
 where $A$ is a subset of the space $S$.
 
+For a Bivariate Distribution, X and Y are independent iff $f(x,y)=f_X(x)\cdot f_Y(y)$
 ### Marginal Distribution
 The **marginal distribution** gives the probabilities for any one of the variables with no reference to any specific ranges of values for the other variables
 

@@ -60,5 +60,5 @@ The **_variance_** of an estimator $F$ is defined as
 
 **_Mean squared error_** is defined as the expectation of the squared difference of an estimator and the true value. For an unbiased estimator, MSE is equal to the variance; otherwise it is the sum of variance and the squared bias of the estimator.
 
-> $MSE[F] = E[(F - \int_{} f(x)dx)^2]$
+> $MSE[F] = E[(F - \int f(x)dx)^2]$
 

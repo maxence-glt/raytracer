@@ -21,6 +21,19 @@ For a normal with unknown mean $\mu$, the sample mean
 $$\overline{X}=\frac{1}{n}\sum_{i=1}^{n}X_i$$
 is a point estimator of $\mu$
 
-### Method of Moments Estimation ([[MME]])
-### Method Likelihood Estimation ([[MLE]])
-### [[Unbiased Estimators]]
+### Method of Moments Estimation ([[MME]]) $\hat p$
+### Method Likelihood Estimation ([[MLE]]) $\hat p$
+##### Unbiased Estimators
+An estimator $\hat \theta$ of $\theta$ is unbiased if:
+
+$$E(\hat θ)=θ$$
+
+If $E(θ)≠θ$, we say it is **biased**, and the **bias** is:
+
+$$Bias(θ)=E(θ)−\theta$$
+
+##### Mean Squared Error (MSE)
+Mean squared error is defined as the expectation of the squared difference of an estimator and the true value. For an unbiased estimator, MSE is equal to the variance; otherwise it is the sum of variance and the squared bias of the estimator.
+
+> $MSE[F] = E[(F - \int f(x)dx)^2]$
+> $MSE(\hat\theta)=Bias(\hat\theta,\theta)^2+Var_\theta(\hat\theta)$

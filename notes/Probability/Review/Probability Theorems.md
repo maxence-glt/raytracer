@@ -15,4 +15,5 @@
    $P(A|B)=P(A)$ and $P(B|A)=P(B)$
    or
    $P(A\cap B)=P(A)P(B)$
-10. 
+10. De Morgan's law
+    $(A\cap B)'=A'\cap B' ~~|~~(A\cup B)'=A'\cup B'$

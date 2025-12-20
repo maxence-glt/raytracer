@@ -36,6 +36,7 @@ $$
 > The value z gives the number of standard deviations the particular value of C lies above or below the mean $\mu$
 > 
 > Once you have a _z_ score, you can look up the corresponding probability in a **_z_** **table**
+
 ### Sample Mean of Normal random variables 
 If $X_1, X_2, \ldots, X_n$ are $n$ mutually independent normal variables with means
 

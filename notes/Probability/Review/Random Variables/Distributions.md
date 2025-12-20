@@ -22,7 +22,6 @@ f(k) &= \binom{n}{k}\, p^{k} (1-p)^{n-k}, && k = 0,1,2,\ldots,n \\
 \end{aligned}
 $$
 #### Negative Binomial Distribution
-
 > The distribution of a number of failures $k$ before observing $r^{th}$ success when observing independent Bernoulli trials with probability of success $p$.
 $$
 \begin{aligned}
@@ -103,6 +102,7 @@ $$
 &\text{We often parameterize with } \theta = 1/\lambda.\\[2pt]
 X &\sim \operatorname{Exp}(\theta) \\
 f(x) &= \frac{1}{\theta}\, e^{-x/\theta}, \qquad 0 \le x < \infty \\[2pt]
+F(x) &= 1- e^{-x/\theta}, \qquad 0 \le x < \infty \\[2pt]
 \mathbb{E}[X] &= \theta \\[2pt]
 \operatorname{Var}(X) &= \theta^{2}
 \end{aligned}

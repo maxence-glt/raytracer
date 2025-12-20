@@ -12,8 +12,13 @@ The $r^{th}$ **central moment** of a [[random variables|random variable]] $X$ is
 Let $X$ be a [[Random Variables|discrete random variable]] with [[Probability Mass Function|PMF]] $f(x)$ and space $S$. If there is a positive number $h$ such that 
 $$E(e^{tX})=\sum_{x\in S}e^{tx}f(x)$$
 exists and is finite for $-h<t<h$, then the function defined by
-$$M(t)=E(e^{tX})$$
+$$M(t)=E(e^{tX})=\int$$
 is called the **moment-generating function (MGF)** of $X$ (or of the distribution of $X$)
+
+To get [[Expected Value]] from MGFs:
+$$
+E(X^n)=M^{(n)}_X(0)=\frac{d^nM_X}{dt^n}(0)
+$$
 
 >**Example**
 >
