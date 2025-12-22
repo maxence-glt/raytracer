@@ -47,5 +47,7 @@ images/
 logs/
 .obsidian/
 compiledCode
+tests
 source/.cache/
 source/compile_commands.json
+build/
