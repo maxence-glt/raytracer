@@ -50,14 +50,14 @@ inline std::string red(const std::string &s) {
 }
 
 inline std::string yellow(const std::string &s) {
-    const char *yellow = "\033[1m\033[38;5;100m";
-    const char *reset = "\033[0m";
-    return std::string(yellow) + s + std::string(reset);
+    const std::string yellow = "\033[1m\033[33m";
+    const std::string reset = "\033[0m";
+    return yellow + s + reset;
 }
 
 inline std::string green(const std::string &s) {
-    const char *green = "\033[1m\033[38;5;22m";
-    const char *reset = "\033[0m";
+    const std::string green = "\033[1m\033[32m";
+    const std::string reset = "\033[0m";
     return std::string(green) + s + std::string(reset);
 }
 
@@ -105,8 +105,8 @@ void log(LogLevel level, const char *file, int line, const std::string &s) {
 
 void testLogs() {
     LOG_VERBOSE("testing log verbose");
+    LOG_DEBUG("testing log debug");
     LOG_WARNING("testing log warning");
     LOG_ERROR("testing log error");
-    LOG_DEBUG("testing log debug");
     LOG_FATAL("testing log fatal");
 }

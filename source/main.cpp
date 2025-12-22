@@ -19,14 +19,11 @@ int main() {
     LOG_VERBOSE("Starting raytracing:");
     //many_balls();
     //testErrors();
-    //testLogs();
+    testLogs();
 
     Vector3i p1(1, 2, 3);
     Vector3i p2(4, 5,  6);
     auto p3 = dot(p1, p2);
-
-    CHECK(0);
-    DCHECK_EQ(1, 2);
 
     LOG_VERBOSE("Finished render succesfully, shutting down logging\n\n******************************************************\n\n");
 
