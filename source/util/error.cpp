@@ -1,4 +1,5 @@
 #include <cstddef>
+#include <exception>
 #include <memory>
 #include <print>
 #include <format>
@@ -6,7 +7,10 @@
 #include <vector>
 #include <execinfo.h>
 #include <cxxabi.h>
- 
+#include <cerrno>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
 
 #include "error.hpp"
 #include "log.hpp"
@@ -18,21 +22,17 @@ void suppressErrorMessages() {
 }
 
 std::string FileLoc::toString() const {
-    return std::format("{}:{}:{}", std::string(filename.data(), filename.size()), line,
-                        column);
+    return std::format("{}:{}:{}", 
+                       std::string(filename.data(), filename.size()), 
+                       line,
+                       column);
 }
 
-// https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
-inline std::string red(const std::string &s) {
-    const std::string red = "\033[1m\033[31m";
-    const std::string reset = "\033[0m";
-    return red + s + reset;
-}
+enum class ErrorLevel {Warning, Error, Fatal};
 
-static void processError(const char *errorType, const FileLoc *loc, const char *message) {
-    // Build up an entire formatted error string and print it all at once;
-    // this way, if multiple threads are printing messages at once, they
-    // don't get jumbled up...
+static void processError(ErrorLevel errorType, 
+                         const FileLoc *loc, 
+                         const std::string &message) {
     std::string errorString;
 
     if (loc)
@@ -41,32 +41,35 @@ static void processError(const char *errorType, const FileLoc *loc, const char *
     errorString += ": ";
     errorString += message;
 
-    // Print the error message (but not more than one time).
-    static std::string lastError;
-    if (errorString != lastError) {
-        std::print(stderr, "{}\n", red(errorType) + errorString);
-        LOG_VERBOSE("{}", errorType + errorString);
-        //TODO: replace with std::stacktrace when clang supports it
-        printStackTrace(stderr, 65);
-        lastError = errorString;
+    switch (errorType) {
+        case ErrorLevel::Warning:
+            LOG_WARNING("{}", errorString); break;
+        case ErrorLevel::Error:
+            LOG_ERROR("{}", errorString); break;
+        case ErrorLevel::Fatal:
+            LOG_FATAL("{}", errorString); break;
     }
+
+    printStackTrace();
+    if (logging::logFile)
+        printStackTrace(logging::logFile, 65);
 }
 
-void warning(const FileLoc *loc, const char *message) {
+void warning(const FileLoc *loc, const std::string &message) {
     if (quiet)
         return;
-    processError("Warning", loc, message);
+    processError(ErrorLevel::Warning, loc, message);
 }
 
-void error(const FileLoc *loc, const char *message) {
+void error(const FileLoc *loc, const std::string &message) {
     if (quiet)
         return;
-    processError("Error", loc, message);
+    processError(ErrorLevel::Error, loc, message);
 }
 
-void errorExit(const FileLoc *loc, const char *message) {
-    processError("Fatal Error", loc, message);
-    exit(1);
+[[noreturn]] void errorFatal(const FileLoc* loc, const std::string& message) {
+    processError(ErrorLevel::Fatal, loc, message);
+    std::terminate();
 }
 
 int lastError() {
@@ -90,7 +93,7 @@ void testErrors() {
     error(&eloc, "error (with loc): file='{}' line={} col={}",
           eloc.filename, eloc.line, eloc.column);
 
-    //errorExit("fatal error (no loc): {} {}", "test", 3);
+    //errorFatal("fatal error (no loc): {} {}", "test", 3);
 
     /*
     errorExit(&eloc,
@@ -109,7 +112,7 @@ std::vector<std::string> splitString(const std::string& input) {
     return tokens;
 }
 
-void printStackTrace(FILE *out = stderr, unsigned int max_frames = 10)
+void printStackTrace(FILE *out, unsigned int max_frames)
 {
     std::print(out, "stack trace:\n");
 
@@ -141,7 +144,7 @@ void printStackTrace(FILE *out = stderr, unsigned int max_frames = 10)
         auto prettySymbols = splitString(it);
 
         if (prettySymbols.size() < 6) {
-            std::print(stderr, "prettySymbols.size() < 6 with it={}\n", it);
+            std::print(out, "prettySymbols.size() < 6 with it={}\n", it);
             continue;
         }
 
@@ -155,13 +158,14 @@ void printStackTrace(FILE *out = stderr, unsigned int max_frames = 10)
             prettySymbols[3] = cxx_sname.get();
         // ignore the errors for names that aren't mangled (errno -2)
         else if (status != -2)
-            std::print(stderr, "__cxa_demangle failed with error={}\n", status);
+            std::print(out, "__cxa_demangle failed with error={}\n", status);
 
         std::print(out, "{:3} {:15} {:25} {} {} {}\n", 
                    prettySymbols[0], prettySymbols[1], prettySymbols[2],
                    prettySymbols[3], prettySymbols[4], prettySymbols[5]);
+        std::fflush(out);
     }
 
-    std::print("\n");
+    std::print(out, "\n");
 }
 

@@ -2,6 +2,7 @@
 #include "error.hpp"
 #include "timing.hpp"
 #include <cstdio>
+#include <exception>
 #include <print>
 
 float elapsedSeconds() {
@@ -23,13 +24,17 @@ void initLogging(LogLevel level, std::string logFile, bool logUtilization) {
     if (!logFile.empty()) {
         logFile = "../logs/" + logFile + ".log";
         logging::logFile = fopen(logFile.c_str(), "ab");
-        if (!logging::logFile)
-            errorExit("{}: {}", logFile, errorString());
+        if (!logging::logFile) {
+            std::print("{}: {}", logFile, errorString());
+            std::terminate();
+        }
         logging::logLevel = LogLevel::Verbose;
     }
 
-    if (level == LogLevel::Invalid)
-        errorExit("Invalid --log-level specified.");
+    if (level == LogLevel::Invalid) {
+        std::print("Invalid --log-level specified.");
+        std::terminate();
+    }
 
     if (logUtilization) {
         // TODO: https://stackoverflow.com/a/1911863/21144460
@@ -37,54 +42,71 @@ void initLogging(LogLevel level, std::string logFile, bool logUtilization) {
     }
 }
 
-LogLevel logLevelFromString(const std::string &s) {
-    if (s == "verbose")
-        return LogLevel::Verbose;
-    else if (s == "error")
-        return LogLevel::Error;
-    else if (s == "fatal")
-        return LogLevel::Fatal;
-    return LogLevel::Invalid;
+// https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
+inline std::string red(const std::string &s) {
+    const std::string red = "\033[1m\033[31m";
+    const std::string reset = "\033[0m";
+    return red + s + reset;
 }
 
-std::string toString(LogLevel level) {
+inline std::string yellow(const std::string &s) {
+    const char *yellow = "\033[1m\033[38;5;100m";
+    const char *reset = "\033[0m";
+    return std::string(yellow) + s + std::string(reset);
+}
+
+inline std::string green(const std::string &s) {
+    const char *green = "\033[1m\033[38;5;22m";
+    const char *reset = "\033[0m";
+    return std::string(green) + s + std::string(reset);
+}
+
+std::string toString(LogLevel level, bool colored) {
     switch (level) {
-    case LogLevel::Verbose:
-        return "VERBOSE";
-    case LogLevel::Error:
-        return "ERROR";
-    case LogLevel::Fatal:
-        return "FATAL";
-    default:
-        return "UNKNOWN";
+        case LogLevel::Verbose:
+            return "";
+        case LogLevel::Warning:
+            return colored ? yellow("WARNING") : "WARNING";
+        case LogLevel::Error:
+            return colored ? red("ERROR") : "ERROR";
+        case LogLevel::Debug:
+            return colored ? green("DEBUG") : "DEBUG";
+        case LogLevel::Fatal:
+            return colored ? red("FATAL") : "FATAL";
+        default:
+            return "UNKNOWN";
     }
 }
 
-void log(LogLevel level, const char *file, int line, const char *s) {
-    if (!s || s[0] == '\0')
+void log(LogLevel level, const char *file, int line, const std::string &s) {
+    if (s.empty())
         return;
 
-    std::string levelString;
-    if (level != LogLevel::Verbose) {
-        levelString = toString(level);
-        levelString.push_back(' ');
-    }
-
-    std::FILE* out = logging::logFile ? logging::logFile : stderr;
-
-    std::println(out,
+    std::println(stderr,
         "[ {} {}:{} ] {}{}",
         elapsedSeconds(),
         file, line,
-        levelString, s
+        toString(level, true) + (level == LogLevel::Verbose ? "" : " "),
+        s
     );
+    std::fflush(stderr);
 
     if (logging::logFile) {
-        std::fflush(out); // keep your old behavior
+        std::println(logging::logFile,
+            "[ {} {}:{} ] {}{}",
+            elapsedSeconds(),
+            file, line,
+            toString(level, false) + (level == LogLevel::Verbose ? "" : " "),
+            s
+        );
+        std::fflush(logging::logFile);
     }
 }
-void logFatal(LogLevel level, const char *file, int line, const char *s) {
-    log(level, file, line, s);
 
-    abort();
+void testLogs() {
+    LOG_VERBOSE("testing log verbose");
+    LOG_WARNING("testing log warning");
+    LOG_ERROR("testing log error");
+    LOG_DEBUG("testing log debug");
+    LOG_FATAL("testing log fatal");
 }

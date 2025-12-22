@@ -1,8 +1,8 @@
 #pragma once
 
-#include "log.hpp"
+#include "error.hpp"
 
-#define CHECK(x) (!(!(x) && (LOG_FATAL("Check failed: {}", #x), true)))
+#define CHECK(x) (!(!(x) && (errorFatal("Check failed: {}", #x), true)))
 
 #define CHECK_EQ(a, b) CHECK_IMPL(a, b, ==)
 #define CHECK_NE(a, b) CHECK_IMPL(a, b, !=)
@@ -12,13 +12,13 @@
 #define CHECK_LE(a, b) CHECK_IMPL(a, b, <=)
 
 #define CHECK_IMPL(a, b, op)                                                           \
-    do {                                                                               \
-        auto va = a;                                                                   \
-        auto vb = b;                                                                   \
-        if (!(va op vb))                                                               \
-            LOG_FATAL("Check failed: {} " #op " {} with {} = {}, {} = {}", #a, #b, #a, \
-                      va, #b, vb);                                                     \
-    } while (false) /* swallow semicolon */
+do {   \
+    auto va = a;                                                        \
+    auto vb = b;                                                        \
+    if (!(va op vb))                                                    \
+        errorFatal("Check failed: {} " #op " {} with {} = {}, {} = {}", \
+        #a, #b, #a, va, #b, vb);                                        \
+} while (false) /* swallow semicolon */
 
 #ifdef DEBUG_BUILD
 
