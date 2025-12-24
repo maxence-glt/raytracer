@@ -47,7 +47,7 @@ public:
     }
 
     void shutdown() { profiling = false; }
-    void print();
+    void print(bool sortByTime = false);
 
     bool profiling = false;
 

@@ -1,3 +1,4 @@
+#include "util/error.hpp"
 #include "worlds.hpp"
 #include "util/log.hpp"
 #include "util/profiler.hpp"
@@ -17,7 +18,7 @@ int main() {
 
     sample_end(s.release());
 
-    profiler.print();
+    profiler.print(true);
 
     LOG_VERBOSE("Finished render succesfully, shutting down logging\n\n******************************************************\n\n");
 

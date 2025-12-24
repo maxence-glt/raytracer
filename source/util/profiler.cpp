@@ -55,7 +55,7 @@ void sample_end(Sample* sample) {
     sample->timeAlive += curr_time() - sample->lastTick;
 }
 
-void Profiler::print() {
+void Profiler::print(bool sortByTime) {
     if (!profiling) {
         LOG_WARNING("Ignoring Profiler::print(), profiler deactivated");
         return;
@@ -84,8 +84,17 @@ void Profiler::print() {
         }
     }
 
-    for (auto &[p, kids] : children)
-        std::sort(kids.begin(), kids.end());
+    for (auto& [p, kids] : children) {
+        if (sortByTime) {
+            std::sort(kids.begin(), kids.end(),
+                      [&byIndex, &entries](int a, int b) {
+                      return entries.at(byIndex.at(a)).s->timeAlive >
+                      entries.at(byIndex.at(b)).s->timeAlive;
+                      });
+        } else {
+            std::sort(kids.begin(), kids.end());
+        }
+    }
 
     int nameWidth = 15;
 

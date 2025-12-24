@@ -63,7 +63,7 @@ struct camera {
 
         auto t2 = curr_time();
         auto ms_int = diff_time<milliseconds>(t1, t2);
-        std::clog << "\rFinished ray tracing in " << ms_int.count() << "ms\n";
+        std::print(stderr, "\n");
         LOG_VERBOSE("Finished ray tracing in {}ms", ms_int.count());
     }
 
