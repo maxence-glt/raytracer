@@ -1,5 +1,5 @@
 PROGRAM_NAME = compiledCode
-CXX = clang++
+CXX = /opt/homebrew/opt/llvm/bin/clang++
 
 CXXFLAGS_RELEASE = -std=c++23 -O3
 # make sure to have the right clang env variables, more at bottom
@@ -18,7 +18,7 @@ GTEST_LIBS     = -L$(GTEST_LIB_DIR) -lgtest -lgtest_main -pthread
 BUILD_DIR := ../build
 
 # Source files for the main program (no test sources here)
-SRCS := main.cpp worlds.cpp integrations.cpp util/vecmath.cpp util/error.cpp util/log.cpp
+SRCS := main.cpp worlds.cpp integrations.cpp util/vecmath.cpp util/error.cpp util/log.cpp util/profiler.cpp
 
 # Source files that contain unit tests
 TEST_SRCS := util/vecmath_test.cpp
@@ -55,7 +55,7 @@ render: $(PROGRAM_NAME)
 	kitten icat ../images/"$(OUT)"
 
 debug: CXXFLAGS = $(CXXFLAGS_DEBUG)
-debug: clean $(PROGRAM_NAME)
+debug: $(PROGRAM_NAME)
 
 test: $(TEST_PROGRAM)
 	./$(TEST_PROGRAM)
