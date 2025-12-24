@@ -4,6 +4,7 @@
 #include "hittable.h"
 #include "main.h"
 #include "material.h"
+#include "util/profiler.hpp"
 #include "vec3.h"
 #include "util/timing.hpp"
 #include "util/log.hpp"
@@ -41,6 +42,7 @@ struct camera {
     vec3   pixel_delta_v;
 
     void render(const hittable &world) {
+        auto s = sample_start("render");
         initialize();
 
         std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
@@ -105,6 +107,7 @@ struct camera {
     int max_depth = 10;
 
     ray get_ray(int i, int j) const {
+        auto s = sample_start("get_ray");
         auto offset = sample_square();
         auto pixel_sample = pixel00_loc
                             + ((i + offset.x()) * pixel_delta_u)
@@ -115,6 +118,7 @@ struct camera {
     }
 
     color ray_color(const ray &r0, const hittable& world) const {
+        auto s = sample_start("ray_color");
         ray r = r0;
         color throughput(1.0, 1.0, 1.0);
 
@@ -124,8 +128,9 @@ struct camera {
                 break;
 
             color attenuation;
-            if (!rec.mat->scatter(r, rec, attenuation, r))
+            if (!rec.mat->scatter(r, rec, attenuation, r)) {
                 return color(0.0, 0.0, 0.0);
+            }
 
             throughput = throughput * attenuation;
         }

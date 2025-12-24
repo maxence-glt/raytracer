@@ -1,8 +1,10 @@
 #include "camera.h"
 #include "hittable_list.h"
 #include "sphere.h"
+#include "util/profiler.hpp"
 
 void many_balls() {
+    auto s = sample_start("world init");
     hittable_list world;
 
     auto ground_material = std::make_shared<lambertian>(color(0.5, 0.5, 0.5));
@@ -49,7 +51,7 @@ void many_balls() {
 
     cam.aspect_ratio      = 16.0 / 9.0;
     cam.image_width       = 400;
-    cam.samples_per_pixel = 10;
+    cam.samples_per_pixel = 1;
     cam.max_depth         = 50;
 
     cam.vfov     = 20;
@@ -60,5 +62,8 @@ void many_balls() {
     cam.defocus_angle = 0.6;
     cam.focus_dist    = 10.0;
 
+    sample_end(s.release());
+
     cam.render(world);
+
 }

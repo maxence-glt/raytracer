@@ -19,7 +19,7 @@ LogLevel logLevel = LogLevel::Error;
 FILE *logFile;
 } // namespace logging
 
-void initLogging(LogLevel level, std::string logFile, bool logUtilization) {
+void initLogging(LogLevel level, std::string logFile) {
     logging::logLevel = level;
     if (!logFile.empty()) {
         logFile = "../logs/" + logFile + ".log";
@@ -34,11 +34,6 @@ void initLogging(LogLevel level, std::string logFile, bool logUtilization) {
     if (level == LogLevel::Invalid) {
         std::print("Invalid --log-level specified.");
         std::terminate();
-    }
-
-    if (logUtilization) {
-        // TODO: https://stackoverflow.com/a/1911863/21144460
-        // make logging its own thread
     }
 }
 

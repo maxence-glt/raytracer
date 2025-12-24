@@ -8,7 +8,7 @@ enum class LogLevel {Verbose, Warning, Error, Debug, Fatal, Invalid};
 std::string toString(LogLevel level, bool colored);
 LogLevel logLevelFromString(const std::string &s);
 
-void initLogging(LogLevel level, std::string logFile, bool logUtilization);
+void initLogging(LogLevel level = LogLevel::Verbose, std::string logFile = "");
 void shutdownLogging();
 
 namespace logging {

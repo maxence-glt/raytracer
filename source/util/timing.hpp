@@ -10,7 +10,7 @@ using std::chrono::nanoseconds;
 using std::chrono::microseconds;
 using std::chrono::milliseconds;
 using std::chrono::seconds;
-using std::chrono::milliseconds;
+using namespace std::chrono_literals;
 
 using timePoint = std::chrono::time_point<std::chrono::high_resolution_clock>;
 

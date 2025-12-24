@@ -1,7 +1,9 @@
 #pragma once
 
 #include "interval.h"
+#include "ray.h"
 #include "vec3.h"
+#include "util/profiler.hpp"
 
 using color = vec3;
 
@@ -11,6 +13,7 @@ inline double linear_to_gamma(double linear_component) {
 }
 
 inline void write_color(std::ostream &out, const color &pixel_color) {
+    auto s = sample_start("write_color");
     auto r = pixel_color.e[0];
     auto g = pixel_color.e[1];
     auto b = pixel_color.e[2];

@@ -6,24 +6,32 @@
 #include "util/log.hpp"
 #include "util/math.hpp"
 #include "util/vecmath.hpp"
+#include "util/profiler.hpp"
 #include <array>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <cxxabi.h>
+#include <thread>
 #include <vector>
 #include "util/check.h"
 
-int main() {
-    initLogging(LogLevel::Verbose, "manyBalls", true);
-    LOG_VERBOSE("Starting raytracing:");
-    //many_balls();
-    //testErrors();
-    testLogs();
+Profiler profiler;
 
-    Vector3i p1(1, 2, 3);
-    Vector3i p2(4, 5,  6);
-    auto p3 = dot(p1, p2);
+int main() {
+    initLogging();
+    LOG_VERBOSE("Starting raytracing:");
+    profiler.init();
+
+    auto s = sample_start("main");
+
+    many_balls();
+    //testErrors();
+    //testLogs();
+
+    sample_end(s.release());
+
+    profiler.print();
 
     LOG_VERBOSE("Finished render succesfully, shutting down logging\n\n******************************************************\n\n");
 
