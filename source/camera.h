@@ -42,7 +42,7 @@ struct camera {
     vec3   pixel_delta_v;
 
     void render(const hittable &world) {
-        auto s = sample_start("render");
+        PROFILE_SCOPE("render");
         initialize();
 
         std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
@@ -68,6 +68,7 @@ struct camera {
     }
 
     void initialize() {
+        PROFILE_SCOPE("initialize");
         image_height = std::max(int(image_width / aspect_ratio), 1);
         center = point3(0, 0, 0);
         pixel_samples_scale = 1.0 / samples_per_pixel;
@@ -107,7 +108,7 @@ struct camera {
     int max_depth = 10;
 
     ray get_ray(int i, int j) const {
-        auto s = sample_start("get_ray");
+        PROFILE_SCOPE("get_ray");
         auto offset = sample_square();
         auto pixel_sample = pixel00_loc
                             + ((i + offset.x()) * pixel_delta_u)
@@ -118,14 +119,16 @@ struct camera {
     }
 
     color ray_color(const ray &r0, const hittable& world) const {
-        auto s = sample_start("ray_color");
+        PROFILE_SCOPE("ray_color");
         ray r = r0;
         color throughput(1.0, 1.0, 1.0);
 
         for (int depth = 0; depth < max_depth; ++depth) {
             hit_record rec;
+            auto s = sample_start("ray_color::hit");
             if (!world.hit(r, interval(0.001, infinity), rec))
                 break;
+            sample_end(s.release());
 
             color attenuation;
             if (!rec.mat->scatter(r, rec, attenuation, r)) {

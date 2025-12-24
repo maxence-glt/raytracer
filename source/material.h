@@ -2,6 +2,7 @@
 #define MATERIAL_H
 
 #include "hittable.h"
+#include "util/profiler.hpp"
 
 struct material {
     virtual ~material() = default;
@@ -20,6 +21,7 @@ public:
 
     bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered)
     const override {
+        PROFILE_SCOPE("lambertian::scatter");
         auto scatter_direction = rec.normal + random_unit_vector();
 
         if (scatter_direction.near_zero())
@@ -40,6 +42,7 @@ public:
 
     bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered)
     const override {
+        PROFILE_SCOPE("metal::scatter");
         vec3 reflected = reflect(r_in.dir, rec.normal);
         reflected = unit_vector(reflected) + (fuzz * random_unit_vector());
         scattered = ray(rec.p, reflected);
@@ -59,6 +62,7 @@ public:
 
     bool scatter(const ray &r_in, const hit_record &rec, color &attenuation, ray &scattered)
     const override {
+        PROFILE_SCOPE("dielectric::scatter");
         attenuation = color(1.0, 1.0, 1.0);
         double ri = rec.front_face ? (1.0/refraction_index) : refraction_index;
 

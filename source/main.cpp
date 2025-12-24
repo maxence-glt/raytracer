@@ -1,20 +1,6 @@
-#include "integrations.hpp"
-#include "util/timing.hpp"
 #include "worlds.hpp"
-#include "util/vecmath.hpp"
-#include "util/error.hpp"
 #include "util/log.hpp"
-#include "util/math.hpp"
-#include "util/vecmath.hpp"
 #include "util/profiler.hpp"
-#include <array>
-#include <cmath>
-#include <iomanip>
-#include <iostream>
-#include <cxxabi.h>
-#include <thread>
-#include <vector>
-#include "util/check.h"
 
 Profiler profiler;
 

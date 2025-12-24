@@ -4,7 +4,7 @@
 #include "util/profiler.hpp"
 
 void many_balls() {
-    auto s = sample_start("world init");
+    auto s = sample_start("many_balls init");
     hittable_list world;
 
     auto ground_material = std::make_shared<lambertian>(color(0.5, 0.5, 0.5));
@@ -65,5 +65,4 @@ void many_balls() {
     sample_end(s.release());
 
     cam.render(world);
-
 }

@@ -2,6 +2,7 @@
 #define SPHERE_H
 
 #include "hittable.h"
+#include "util/profiler.hpp"
 
 class sphere : public hittable {
 public:

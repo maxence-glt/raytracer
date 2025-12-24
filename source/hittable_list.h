@@ -2,6 +2,7 @@
 #define HITTABLE_LIST_H
 
 #include "hittable.h"
+#include "util/profiler.hpp"
 #include <vector>
 
 using std::shared_ptr;

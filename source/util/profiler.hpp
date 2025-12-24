@@ -1,67 +1,70 @@
 #pragma once
 
 #include <chrono>
-#include <deque>
 #include <functional>
+#include <map>
 #include <memory>
 #include <string>
-//#include <unordered_map>
-#include <map>
+#include <string_view>
 #include <vector>
+
 #include "timing.hpp"
 
-/*
-* Track "samples" which are segments of code
-* Profiler outputs:
-*   each sample's basic info (name, location, etc)
-*   avg/min/max percentage of time spent on that sample
-*   # of times that sample was called
-*   relationship to other samples (parent/child)
-*
-* Implementation:
-*   To keep the call-stack in the profiler output, we 
-*/
-
 struct Sample {
-    std::string sampleName;
-    std::string callStack;
-    int index;
-    size_t calls;
-    timePoint lastTick;
-    high_resolution_clock::duration timeAlive;
-    bool alive;
+    int index = 0;
+    int parent = 0;
+
+    size_t calls = 0;
+
+    timePoint lastTick{};
+    high_resolution_clock::duration timeAlive{};
+
+    bool alive = false;
 };
 
+class Profiler;
+extern Profiler profiler;
 
-void sample_end(Sample *sample);
+void sample_end(Sample* sample);
 
 inline constexpr auto sampleDeleter = [](Sample* s) noexcept {
     if (s && s->alive) sample_end(s);
 };
+
 using SampleHandle = std::unique_ptr<Sample, decltype(sampleDeleter)>;
 
-SampleHandle sample_start(const std::string &sampleName);
+[[nodiscard]] SampleHandle sample_start(std::string_view sampleName);
 
 class Profiler {
 public:
     void init() {
         profiling = true;
         firstTick = curr_time();
+        currIndex = 1;
+        stack.clear();
+        stack.reserve(20);
+        stack.push_back(0);
     }
 
-    friend SampleHandle sample_start(const std::string &sampleName);
-    friend void sample_end(Sample *sample);
+    void shutdown() { profiling = false; }
     void print();
 
     bool profiling = false;
 
 private:
-    int currIndex{1};
-    std::string callStack{"0"};
-    timePoint firstTick;
-    // change to hashmap when llvm issue is gone
-    //std::unordered_map<std::string, std::vector<Sample>> samples;
-    std::map<std::string, std::deque<Sample>> samples;
+    friend SampleHandle sample_start(std::string_view sampleName);
+    friend void sample_end(Sample* sample);
+
+    int currIndex = 1;
+
+    std::vector<int> stack{0};
+
+    timePoint firstTick{};
+
+    using Bucket = std::map<int, Sample>;
+    std::map<std::string, Bucket, std::less<>> samples;
 };
 
-extern Profiler profiler;
+#define PROF_CONCAT(a, b) a##b
+#define PROFILE_SCOPE(name) \
+    auto PROF_CONCAT(_profile_scope_, __COUNTER__) = sample_start(name)

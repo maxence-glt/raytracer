@@ -19,7 +19,7 @@ LogLevel logLevel = LogLevel::Error;
 FILE *logFile;
 } // namespace logging
 
-void initLogging(LogLevel level, std::string logFile) {
+void initLogging(std::string logFile, LogLevel level) {
     logging::logLevel = level;
     if (!logFile.empty()) {
         logFile = "../logs/" + logFile + ".log";
