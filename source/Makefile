@@ -18,9 +18,10 @@ GTEST_LIBS     = -L$(GTEST_LIB_DIR) -lgtest -lgtest_main -pthread
 BUILD_DIR := ../build
 
 # Source files for the main program (no test sources here)
-SRCS := main.cpp worlds.cpp integrations.cpp util/vecmath.cpp util/error.cpp util/log.cpp util/profiler.cpp
+SRCS := main.cpp worlds.cpp util/error.cpp util/log.cpp util/profiler.cpp
 
 # Source files that contain unit tests
+# NOTE: make test directory
 TEST_SRCS := util/vecmath_test.cpp
 
 OBJS      := $(SRCS:%.cpp=$(BUILD_DIR)/%.o)

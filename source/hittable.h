@@ -1,28 +1,31 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
-#include "main.h"
+#include <memory>
+#include "interval.h"
+#include "util/vecmath.hpp"
+#include "ray.hpp"
+#include "raytracer.hpp"
+
 class material;
 
 struct hit_record {
-    point3 p;
-    vec3 normal;
+    Point3f p;
+    Normal3f normal;
     std::shared_ptr<material> mat;
-    double t;
+    Float t;
     bool front_face;
 
-    void set_face_normal(const ray& r, const vec3& outward_normal) {
-        // Sets the hit record normal vector.
+    void set_face_normal(const Ray &r, const Normal3f &outward_normal) {
         // NOTE: the parameter `outward_normal` is assumed to have unit length.
-
-        front_face = dot(r.dir, outward_normal) < 0;
+        front_face = dot(r.d, outward_normal) < 0;
         normal = front_face ? outward_normal : -outward_normal;
     }
 };
 
 struct hittable {
     virtual ~hittable() = default;
-    virtual bool hit(const ray &r, 
+    virtual bool hit(const Ray &r, 
                      interval ray_t,
                      hit_record &rec) const = 0;
 };

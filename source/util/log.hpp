@@ -1,5 +1,6 @@
 #pragma once
 
+#include "error.hpp"
 #include <format>
 #include <string>
 
@@ -43,7 +44,12 @@ inline void log(LogLevel level, const char *file, int line, const char *fmt,
 template <typename... Args>
 inline void log(LogLevel level, const char *file, int line, const char *fmt,
                 Args &&...args) {
-    std::string s = std::vformat(fmt, std::make_format_args(args...));
+    std::string s;
+    try {
+        s = std::vformat(fmt, std::make_format_args(args...));
+    } catch (...) {
+        errorFatal("log failed on vformat({})", fmt);
+    }
     log(level, file, line, s);
 }
 

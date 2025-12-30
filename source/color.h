@@ -1,22 +1,22 @@
 #pragma once
 
 #include "interval.h"
-#include "ray.h"
-#include "vec3.h"
+#include "util/vecmath.hpp"
 #include "util/profiler.hpp"
+#include "raytracer.hpp"
 
-using color = vec3;
+using color = Vector3f;
 
-inline double linear_to_gamma(double linear_component) {
+inline Float linear_to_gamma(Float linear_component) {
     if (linear_component > 0) return std::sqrt(linear_component);
     return 0;
 }
 
 inline void write_color(std::ostream &out, const color &pixel_color) {
     PROFILE_SCOPE("write_color");
-    auto r = pixel_color.e[0];
-    auto g = pixel_color.e[1];
-    auto b = pixel_color.e[2];
+    auto r = pixel_color[0];
+    auto g = pixel_color[1];
+    auto b = pixel_color[2];
 
     r = linear_to_gamma(r);
     g = linear_to_gamma(g);

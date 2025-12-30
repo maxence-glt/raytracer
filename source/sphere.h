@@ -2,22 +2,24 @@
 #define SPHERE_H
 
 #include "hittable.h"
-#include "util/profiler.hpp"
+#include "ray.hpp"
+#include "util/vecmath.hpp"
+#include "raytracer.hpp"
 
 class sphere : public hittable {
 public:
-    sphere(const point3 &center, double radius, std::shared_ptr<material> mat)
+    sphere(const Point3f &center, Float radius, std::shared_ptr<material> mat)
         : center(center), radius(std::fmax(0, radius)), mat(mat)
         {}
 
-    bool hit(const ray &r, 
+    bool hit(const Ray &r, 
              interval ray_t,
              hit_record &rec) const override {
-        vec3 oc = center - r.orig;
+        Vector3f oc = center - r.o;
 
-        auto a = r.dir.lengthSquared();
-        auto b = dot(r.dir, oc);
-        auto c = oc.lengthSquared() - radius*radius;
+        auto a = lengthSquared(r.d);
+        auto b = dot(r.d, oc);
+        auto c = lengthSquared(oc) - radius*radius;
 
         auto discriminant = b*b - a*c;
 
@@ -33,8 +35,8 @@ public:
         }
 
         rec.t = root;
-        rec.p = r.at(rec.t);
-        vec3 outward_normal = (rec.p - center) / radius;
+        rec.p = r(rec.t);
+        Normal3f outward_normal = Normal3f(rec.p - center) / radius;
         rec.set_face_normal(r, outward_normal);
         rec.mat = mat;
 
@@ -42,8 +44,8 @@ public:
     }
 
 private:
-    point3 center;
-    double radius;
+    Point3f center;
+    Float radius;
     std::shared_ptr<material> mat;
 };
 

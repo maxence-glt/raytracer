@@ -25,7 +25,7 @@ TEST(Vector3, Basics) {
     EXPECT_EQ(0, maxComponentIndex(-vf));
     EXPECT_EQ(0, minComponentIndex(vf));
     EXPECT_EQ(1, minComponentIndex(-vf));
-    EXPECT_EQ(Vector3<float>(-1/sqrt(105), 10/sqrt(105), 2/sqrt(105)),
+    EXPECT_EQ(Vector3<Float>(-1/sqrt(105), 10/sqrt(105), 2/sqrt(105)),
               normalize(vf));
 }
 
@@ -40,9 +40,9 @@ TEST(Vector, AngleBetween) {
     EXPECT_EQ(0, angleBetween(x, x));
     EXPECT_LT(std::abs(angleBetween(x, -x) - Pi), 3e-7);
 
-    float maxErr = 0, sumErr = 0;
+    Float maxErr = 0, sumErr = 0;
     for (int i = 0; i < 100000; ++i) {
-        Random<float> rng;
+        Rand::Random<Float> rng;
         Vector3f a = normalize(Vector3f(-1 + 2 * rng.random(),
                                         -1 + 2 * rng.random(),
                                         -1 + 2 * rng.random()));
@@ -54,8 +54,8 @@ TEST(Vector, AngleBetween) {
         ad = normalize(ad);
         bd = normalize(bd);
 
-        float v[2] = {float(std::acos(dot(ad, bd))), angleBetween(a, b)};
-        float err = std::abs(v[0] - v[1]) / v[0];
+        Float v[2] = {Float(std::acos(dot(ad, bd))), angleBetween(a, b)};
+        Float err = std::abs(v[0] - v[1]) / v[0];
         maxErr = std::max(err, maxErr);
         sumErr += err;
         EXPECT_LT(err, 5e-6) << v[0] << "vs " << v[1] << ", a: " << a.toString() << ", b: " << b.toString();
@@ -65,7 +65,7 @@ TEST(Vector, AngleBetween) {
     sumErr = 0;
 
     for (int i = 0; i < 100000; ++i) {
-        Random<float> rng;
+        Rand::Random<Float> rng;
         Vector3f a = normalize(Vector3f(-1 + 2 * rng.random(),
                                         -1 + 2 * rng.random(),
                                         -1 + 2 * rng.random()));
@@ -81,8 +81,8 @@ TEST(Vector, AngleBetween) {
         ad = normalize(ad);
         bd = normalize(bd);
 
-        float v[2] = {float(std::acos(dot(ad, bd))), angleBetween(a, b)};
-        float err = std::abs(v[0] - v[1]) / v[0];
+        Float v[2] = {Float(std::acos(dot(ad, bd))), angleBetween(a, b)};
+        Float err = std::abs(v[0] - v[1]) / v[0];
         maxErr = std::max(err, maxErr);
         sumErr += err;
         EXPECT_LT(err, 5e-6) << v[0] << "vs " << v[1] << ", a: " << a.toString() << ", b: " << b.toString();
@@ -95,9 +95,9 @@ TEST(Vector, AngleBetween) {
     ad = normalize(ad);
     bd = normalize(bd);
 
-    float naive = safeACos(dot(a, b));
-    float precise = std::acos(clamp(dot(ad, bd), -1, 1));
-    float abet = angleBetween(a, b);
+    Float naive = safeACos(dot(a, b));
+    Float precise = std::acos(clamp(dot(ad, bd), -1, 1));
+    Float abet = angleBetween(a, b);
     EXPECT_EQ(abet, precise) << std::format("vs naive {}", naive);
 }
 

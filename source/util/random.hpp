@@ -1,24 +1,31 @@
 #pragma once
-
+#include "log.hpp"
 #include <random>
+#include <type_traits>
+
+namespace Rand {
+
+inline std::mt19937_64& engine() {
+    //static thread_local std::mt19937_64 e{ std::random_device{}() };
+    static thread_local std::mt19937_64 e{ 0xDEADBEEFCAFEBABEULL }; // <- unseeded
+    return e;
+}
 
 template <typename T>
-class Random {
-public:
-    Random(T min = (T)0, T max = (T)1)
-    : prng(get_engine()), dis(min, max) 
-    {/* empty ctor */}
+requires std::is_floating_point_v<T>
+inline T random() {
+    std::uniform_real_distribution<T> dis(T(0), T(1));
+    static int i = 0;
+    T out = dis(engine());
+    //LOG_DEBUG("{} = {}", i++, out);
 
-    inline T random() { return dis(prng); }
+    return out;
+}
 
-private:
-    using eng = std::mt19937_64;
+template <typename T>
+requires std::is_floating_point_v<T>
+inline T random(T min, T max) {
+    return min + (max - min)*random<T>();
+}
 
-    static eng& get_engine() {
-        static thread_local eng engine{ std::random_device{}() };
-        return engine;
-    }
-
-    eng& prng;
-    std::uniform_real_distribution<T> dis;
-};
+} // namespace Rand

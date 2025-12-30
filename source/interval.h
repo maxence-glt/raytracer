@@ -1,25 +1,27 @@
 #pragma once
 
+#include "util/math.hpp"
+
 struct interval {
-    double min, max;
+    Float min, max;
 
     interval() : min(+infinity), max(-infinity) {} // Default interval is empty
 
-    interval(double min, double max) : min(min), max(max) {}
+    interval(Float min, Float max) : min(min), max(max) {}
 
-    double size() const {
+    Float size() const {
         return max - min;
     }
 
-    bool contains(double x) const {
+    bool contains(Float x) const {
         return min <= x && x <= max;
     }
 
-    bool surrounds(double x) const {
+    bool surrounds(Float x) const {
         return min < x && x < max;
     }
 
-    double clamp(double x) const {
+    Float clamp(Float x) const {
         if (x < min) return min;
         if (x > max) return max;
         return x;

@@ -1,9 +1,11 @@
 #include "util/error.hpp"
-#include "worlds.hpp"
 #include "util/log.hpp"
 #include "util/profiler.hpp"
+#include <print>
 
 Profiler profiler;
+
+extern void many_balls();
 
 int main() {
     initLogging();

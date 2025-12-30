@@ -88,8 +88,8 @@ void Profiler::print(bool sortByTime) {
         if (sortByTime) {
             std::sort(kids.begin(), kids.end(),
                       [&byIndex, &entries](int a, int b) {
-                      return entries.at(byIndex.at(a)).s->timeAlive >
-                      entries.at(byIndex.at(b)).s->timeAlive;
+                      return entries.at(byIndex.at(a)).s->calls >
+                      entries.at(byIndex.at(b)).s->calls;
                       });
         } else {
             std::sort(kids.begin(), kids.end());
