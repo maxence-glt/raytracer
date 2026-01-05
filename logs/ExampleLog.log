@@ -1,0 +1,7 @@
+[ 0 main.cpp:9 ] Starting raytracing:
+[ 0.274 render/render.cpp:27 ] Finished ray tracing in 274ms
+[ 0.274 main.cpp:18 ] Finished render succesfully, shutting down logging
+
+******************************************************
+
+
