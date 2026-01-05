@@ -46,7 +46,7 @@ public:
     bool scatter(const Ray &r_in, const hit_record &rec, color &attenuation, Ray &scattered)
     const override {
         PROFILE_SCOPE("metal::scatter");
-        Vector3f reflected = reflect(unit_vector(r_in.d), rec.normal);
+        Vector3f reflected = reflect(normalize(r_in.d), rec.normal);
         reflected = reflected + (fuzz * random_unit_vector<Float>());
         scattered = Ray(rec.p, reflected);
         attenuation = albedo;
@@ -69,7 +69,7 @@ public:
         attenuation = color(1.0, 1.0, 1.0);
         Float ri = rec.front_face ? (1.0/refraction_index) : refraction_index;
 
-        Vector3f unit_direction = unit_vector(r_in.d);
+        Vector3f unit_direction = normalize(r_in.d);
         Float cos_theta = std::fmin(dot(-unit_direction, rec.normal), 1.0);
         Float sin_theta = std::sqrt(1.0 - cos_theta*cos_theta);
 

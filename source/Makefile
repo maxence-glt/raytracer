@@ -1,68 +1,95 @@
-PROGRAM_NAME = compiledCode
-CXX = /opt/homebrew/opt/llvm/bin/clang++
+# --------- Toolchain ----------
+PROGRAM_NAME ?= raytracer
+CXX := /opt/homebrew/opt/llvm/bin/clang++
 
-CXXFLAGS_RELEASE = -std=c++23 -O3
-# make sure to have the right clang env variables, more at bottom
-CXXFLAGS_DEBUG   = -std=c++23 -O0 -g -DDEBUG_BUILD \
-				   -fno-omit-frame-pointer -fno-optimize-sibling-calls \
-				   -fsanitize=address,undefined,leak
-CXXFLAGS         = $(CXXFLAGS_RELEASE)
-CPPFLAGS         = -MMD -MP
+CXXFLAGS_COMMON  := -std=c++23
+CXXFLAGS_RELEASE := $(CXXFLAGS_COMMON) -O3
+CXXFLAGS_DEBUG   := $(CXXFLAGS_COMMON) -O0 -g -DDEBUG_BUILD \
+					-fno-omit-frame-pointer -fno-optimize-sibling-calls \
+					-fsanitize=address,undefined,leak -Wno-character-conversion 
+
+CPPFLAGS := -MMD -MP
 
 # ---- GoogleTest config ----
-GTEST_DIR      = /opt/homebrew/opt/googletest
-GTEST_INCLUDE  = $(GTEST_DIR)/include
-GTEST_LIB_DIR  = $(GTEST_DIR)/lib
-GTEST_LIBS     = -L$(GTEST_LIB_DIR) -lgtest -lgtest_main -pthread
+GTEST_DIR      ?= /opt/homebrew/opt/googletest
+GTEST_INCLUDE  := $(GTEST_DIR)/include
+GTEST_LIB_DIR  := $(GTEST_DIR)/lib
+GTEST_LIBS     := -L$(GTEST_LIB_DIR) -lgtest -lgtest_main -pthread
 
-BUILD_DIR := ../build
+# --------- Build dirs ----------
+BUILD_RELEASE := ../build/release
+BUILD_DEBUG   := ../build/debug
 
-# Source files for the main program (no test sources here)
-SRCS := main.cpp worlds.cpp util/error.cpp util/log.cpp util/profiler.cpp
+# --------- Sources ----------
+# main program sources (no test sources here)
+SRCS := main.cpp worlds/manyballs.cpp util/error.cpp util/log.cpp util/profiler.cpp util/transform.cpp render/render.cpp
 
-# Source files that contain unit tests
-# NOTE: make test directory
-TEST_SRCS := util/vecmath_test.cpp
+# test sources (recursive)
+TEST_SRCS := $(shell find test -type f -name '*.cpp')
 
-OBJS      := $(SRCS:%.cpp=$(BUILD_DIR)/%.o)
-TEST_OBJS := $(TEST_SRCS:%.cpp=$(BUILD_DIR)/%.o)
+# --------- Objects ----------
+RELEASE_OBJS := $(patsubst %.cpp,$(BUILD_RELEASE)/%.o,$(SRCS))
+DEBUG_OBJS   := $(patsubst %.cpp,$(BUILD_DEBUG)/%.o,$(SRCS))
+TEST_OBJS    := $(patsubst %.cpp,$(BUILD_DEBUG)/%.o,$(TEST_SRCS))
 
-DEPS := $(OBJS:.o=.d) $(TEST_OBJS:.o=.d)
+RELEASE_DEPS := $(RELEASE_OBJS:.o=.d)
+DEBUG_DEPS   := $(DEBUG_OBJS:.o=.d) $(TEST_OBJS:.o=.d)
 
-TEST_PROGRAM := tests
+# --------- Binaries ----------
+RELEASE_BIN := $(PROGRAM_NAME)
+DEBUG_BIN   := $(PROGRAM_NAME)_debug
+TEST_BIN    := tests
 
-$(PROGRAM_NAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $^
+# --------- Default ----------
+.PHONY: all
+all: $(RELEASE_BIN)
 
-$(TEST_PROGRAM): $(filter-out $(BUILD_DIR)/main.o,$(OBJS)) $(TEST_OBJS)
+# --------- Link rules ----------
+$(RELEASE_BIN): $(RELEASE_OBJS)
+	$(CXX) $(CXXFLAGS_RELEASE) -o $@ $^
+
+$(DEBUG_BIN): $(DEBUG_OBJS)
+	$(CXX) $(CXXFLAGS_DEBUG) -o $@ $^
+
+# tests link against debug-built library objects (no main.o) + debug-built test objs
+$(TEST_BIN): $(filter-out $(BUILD_DEBUG)/main.o,$(DEBUG_OBJS)) $(TEST_OBJS)
 	$(CXX) $(CXXFLAGS_DEBUG) -o $@ $^ $(GTEST_LIBS)
 
-$(BUILD_DIR)/%.o: %.cpp
+# --------- Compile rules ----------
+$(BUILD_RELEASE)/%.o: %.cpp
 	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -I$(GTEST_INCLUDE) -c $< -o $@
+	$(CXX) $(CXXFLAGS_RELEASE) $(CPPFLAGS) -c $< -o $@
 
+$(BUILD_DEBUG)/%.o: %.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS_DEBUG) $(CPPFLAGS) -c $< -o $@
+
+$(TEST_OBJS): CPPFLAGS += -I$(GTEST_INCLUDE)
+
+# --------- Convenience targets ----------
 .PHONY: clean run render debug test
 
 clean:
-	rm -rf $(BUILD_DIR) *.dSYM $(PROGRAM_NAME) $(TEST_PROGRAM)
+	rm -rf ../build *.dSYM $(RELEASE_BIN) $(DEBUG_BIN) $(TEST_BIN)
 
 OUT ?= image.ppm
 
-run: $(PROGRAM_NAME)
-	./$(PROGRAM_NAME) $(ARGS)
+run: $(RELEASE_BIN)
+	./$(RELEASE_BIN) $(ARGS)
 
-render: $(PROGRAM_NAME)
-	./$(PROGRAM_NAME) $(ARGS) > ../images/"$(OUT)"
+render: $(RELEASE_BIN)
+	./$(RELEASE_BIN) $(ARGS) > ../images/"$(OUT)"
 	kitten icat ../images/"$(OUT)"
 
-debug: CXXFLAGS = $(CXXFLAGS_DEBUG)
-debug: $(PROGRAM_NAME)
+debug: $(DEBUG_BIN)
+	./$(DEBUG_BIN) $(ARGS)
 
-test: $(TEST_PROGRAM)
-	./$(TEST_PROGRAM)
+test: $(TEST_BIN)
+	./$(TEST_BIN)
 
--include $(DEPS)
+-include $(RELEASE_DEPS) $(DEBUG_DEPS)
 
+# --------- Notes ----------
 # set your LLVM_SYMBOLIZER_PATH
 # ASan: enable symbolization + leak detection on macOS
 # set -gx ASAN_OPTIONS "detect_leaks=1:symbolize=1:abort_on_error=1:halt_on_error=1:malloc_context_size=50:verbosity=1"

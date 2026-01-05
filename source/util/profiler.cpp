@@ -8,6 +8,7 @@
 #include "profiler.hpp"
 #include "check.h"
 #include "log.hpp"
+#include "math.hpp"
 #include "timing.hpp"
 
 SampleHandle sample_start(std::string_view sampleName) {
@@ -159,3 +160,7 @@ void Profiler::print(bool sortByTime) {
     dfs(0, 0);
     std::print(stderr, "{}\n\n", divider);
 }
+
+
+Profiler profiler;
+

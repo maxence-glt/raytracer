@@ -82,8 +82,8 @@ struct camera {
         auto viewport_height = 2.f * h * focus_dist;
         auto viewport_width = viewport_height * (Float(image_width)/image_height);
 
-        w = unit_vector(lookfrom - lookat);
-        u = unit_vector(cross(vup, w));
+        w = normalize(lookfrom - lookat);
+        u = normalize(cross(vup, w));
         v = cross(w, u);
 
         // Calculate the vectors across the horizontal and down the vertical viewport edges
@@ -140,7 +140,7 @@ struct camera {
             throughput *= attenuation;
         }
 
-        Vector3f unit_direction = unit_vector(r.d);
+        Vector3f unit_direction = normalize(r.d);
         Float t = 0.5*(unit_direction.y + 1.0);
         color lerp = (1.f - t)*color(1.0, 1.0, 1.0) + t*color(0.3, 0.7, 1.0);
 

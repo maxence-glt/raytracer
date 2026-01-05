@@ -37,6 +37,8 @@ using SampleHandle = std::unique_ptr<Sample, decltype(sampleDeleter)>;
 
 class Profiler {
 public:
+    Profiler() { init(); }
+
     void init() {
         profiling = true;
         firstTick = curr_time();

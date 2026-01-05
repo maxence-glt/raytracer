@@ -1,5 +1,5 @@
 #pragma once
-#include "log.hpp"
+
 #include <random>
 #include <type_traits>
 
@@ -17,7 +17,6 @@ inline T random() {
     std::uniform_real_distribution<T> dis(T(0), T(1));
     static int i = 0;
     T out = dis(engine());
-    //LOG_DEBUG("{} = {}", i++, out);
 
     return out;
 }
