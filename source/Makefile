@@ -3,10 +3,15 @@ PROGRAM_NAME ?= raytracer
 CXX := /opt/homebrew/opt/llvm/bin/clang++
 
 CXXFLAGS_COMMON  := -std=c++23
-CXXFLAGS_RELEASE := $(CXXFLAGS_COMMON) -O3
+
+CXXFLAGS_RELEASE := $(CXXFLAGS_COMMON) -O3 \
+	-Rpass=loop-vectorize -Rpass-missed=loop-vectorize \
+	# -Rpass-analysis=loop-vectorize \
+	-Rpass=slp-vectorizer -Rpass-missed=slp-vectorizer
+
 CXXFLAGS_DEBUG   := $(CXXFLAGS_COMMON) -O0 -g -DDEBUG_BUILD \
-					-fno-omit-frame-pointer -fno-optimize-sibling-calls \
-					-fsanitize=address,undefined,leak -Wno-character-conversion 
+	-fno-omit-frame-pointer -fno-optimize-sibling-calls \
+	-fsanitize=address,undefined,leak -Wno-character-conversion
 
 CPPFLAGS := -MMD -MP
 
@@ -22,7 +27,20 @@ BUILD_DEBUG   := ../build/debug
 
 # --------- Sources ----------
 # main program sources (no test sources here)
-SRCS := main.cpp worlds/manyballs.cpp util/error.cpp util/log.cpp util/profiler.cpp util/transform.cpp render/render.cpp
+SRCS := main.cpp worlds/manyballs.cpp util/error.cpp util/log.cpp util/profiler.cpp util/transform.cpp render/render.cpp util/transform.cpp
+
+# Use bash so we can use PIPESTATUS
+SHELL := /bin/bash
+
+empty :=
+space := $(empty) $(empty)
+
+# dirs from SRCS: "worlds/ util/ render/" etc (no "./")
+PROJ_DIRS := $(sort $(filter-out ./,$(dir $(SRCS))))
+PROJ_DIR_ALT := $(subst $(space),|,$(PROJ_DIRS))
+
+VEC_FILTER = rg -v '^In file included from' \
+  | rg '^[^/].*:[0-9]+(:[0-9]+)?: (remark|warning|error):'
 
 # test sources (recursive)
 TEST_SRCS := $(shell find test -type f -name '*.cpp')
@@ -46,7 +64,7 @@ all: $(RELEASE_BIN)
 
 # --------- Link rules ----------
 $(RELEASE_BIN): $(RELEASE_OBJS)
-	$(CXX) $(CXXFLAGS_RELEASE) -o $@ $^
+	@$(CXX) $(CXXFLAGS_RELEASE) -o $@ $^ 2>&1 | $(VEC_FILTER); exit $${PIPESTATUS[0]}
 
 $(DEBUG_BIN): $(DEBUG_OBJS)
 	$(CXX) $(CXXFLAGS_DEBUG) -o $@ $^
@@ -58,7 +76,7 @@ $(TEST_BIN): $(filter-out $(BUILD_DEBUG)/main.o,$(DEBUG_OBJS)) $(TEST_OBJS)
 # --------- Compile rules ----------
 $(BUILD_RELEASE)/%.o: %.cpp
 	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS_RELEASE) $(CPPFLAGS) -c $< -o $@
+	@$(CXX) $(CXXFLAGS_RELEASE) $(CPPFLAGS) -c $< -o $@ 2>&1 | $(VEC_FILTER); exit $${PIPESTATUS[0]}
 
 $(BUILD_DEBUG)/%.o: %.cpp
 	@mkdir -p $(dir $@)

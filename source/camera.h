@@ -42,31 +42,6 @@ struct camera {
     Vector3f pixel_delta_u;
     Vector3f pixel_delta_v;
 
-    void render(const hittable &world) {
-        PROFILE_SCOPE("render");
-        initialize();
-
-        std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
-        auto t1 = curr_time();
-
-        for (int j = 0; j < image_height; ++j) {
-            std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
-
-            for (int i = 0; i < image_width; ++i) {
-                color pixel_color(0, 0, 0);
-                for (int sample = 0; sample < samples_per_pixel; ++sample) {
-                    Ray r = get_ray(i, j);
-                    pixel_color += ray_color(r, world);
-                }
-                write_color(std::cout, pixel_samples_scale*pixel_color);
-            }
-        }
-
-        auto t2 = curr_time();
-        auto ms_int = diff_time<milliseconds>(t1, t2);
-        std::print(stderr, "\n");
-        LOG_VERBOSE("Finished ray tracing in {}ms", ms_int.count());
-    }
 
     void initialize() {
         PROFILE_SCOPE("initialize");

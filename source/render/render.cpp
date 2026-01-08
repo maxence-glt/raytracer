@@ -2,6 +2,9 @@
 
 void render(const Scene &scene) {
     PROFILE_SCOPE("render");
+    LOG_VERBOSE("image_height      = {}", scene.camera.image_height);
+    LOG_VERBOSE("image_width       = {}", scene.camera.image_width);
+    LOG_VERBOSE("samples_per_pixel = {}", scene.camera.samples_per_pixel);
 
     auto cam = scene.camera;
 

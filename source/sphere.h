@@ -4,11 +4,10 @@
 #include "hittable.h"
 #include "ray.hpp"
 #include "util/vecmath.hpp"
-#include "raytracer.hpp"
 
 class sphere : public hittable {
 public:
-    sphere(const Point3f &center, Float radius, std::shared_ptr<material> mat)
+    sphere(const Point3f &center, float radius, std::shared_ptr<material> mat)
         : center(center), radius(std::fmax(0, radius)), mat(mat)
         {}
 
@@ -45,7 +44,7 @@ public:
 
 private:
     Point3f center;
-    Float radius;
+    float radius;
     std::shared_ptr<material> mat;
 };
 

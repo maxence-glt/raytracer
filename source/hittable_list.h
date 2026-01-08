@@ -3,7 +3,6 @@
 
 #include "hittable.h"
 #include <vector>
-#include "raytracer.hpp"
 
 using std::shared_ptr;
 
