@@ -10,11 +10,11 @@
 Scene manyBalls() {
     PROFILE_SCOPE("many_balls init");
 
-    hittable_list world;
+    Spheres world;
     camera cam;
 
-    auto ground_material = std::make_shared<lambertian>(color(0.5, 0.5, 0.5));
-    world.add(std::make_shared<sphere>(Point3f(0,-1000,0), 1000, ground_material));
+    world.materials.push_back(std::make_shared<lambertian>(color(0.5, 0.5, 0.5)));
+    world.centers.push_back({Point3f(0,-1000,0), 1000});
 
     for (int a = -11; a < 11; a++) {
         for (int b = -11; b < 11; b++) {
@@ -27,31 +27,32 @@ Scene manyBalls() {
                 if (choose_mat < 0.8) {
                     // diffuse
                     auto albedo = color::random() * color::random();
-                    sphere_material = std::make_shared<lambertian>(albedo);
-                    world.add(std::make_shared<sphere>(center, 0.2, sphere_material));
+                    world.materials.push_back(std::make_shared<lambertian>(albedo));
+                    world.centers.push_back({center, 0.2});
                 } else if (choose_mat < 0.95) {
                     // metal
                     auto albedo = color::random(0.5, 1);
                     auto fuzz = Rand::random<Float>(0, 0.5);
-                    sphere_material = std::make_shared<metal>(albedo, fuzz);
-                    world.add(std::make_shared<sphere>(center, 0.2, sphere_material));
+                    world.materials.push_back(std::make_shared<metal>(albedo, fuzz));
+                    world.centers.push_back({center, 0.2});
                 } else {
                     // glass
                     sphere_material = std::make_shared<dielectric>(1.5);
-                    world.add(std::make_shared<sphere>(center, 0.2, sphere_material));
+                    world.materials.push_back(std::make_shared<dielectric>(1.5));
+                    world.centers.push_back({center, 0.2});
                 }
             }
         }
     }
 
-    auto material1 = std::make_shared<dielectric>(1.5);
-    world.add(std::make_shared<sphere>(Point3f(0, 1, 0), 1.0, material1));
+    world.materials.push_back(std::make_shared<dielectric>(1.5));
+    world.centers.push_back({Point3f(0, 1, 0), 1.0});
 
-    auto material2 = std::make_shared<lambertian>(color(0.4, 0.2, 0.1));
-    world.add(std::make_shared<sphere>(Point3f(-4, 1, 0), 1.0, material2));
+    world.materials.push_back(std::make_shared<lambertian>(color(0.4, 0.2, 0.1)));
+    world.centers.push_back({Point3f(-4, 1, 0), 1.0});
 
-    auto material3 = std::make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
-    world.add(std::make_shared<sphere>(Point3f(4, 1, 0), 1.0, material3));
+    world.materials.push_back(std::make_shared<metal>(color(0.7, 0.6, 0.5), 0.0));
+    world.centers.push_back({Point3f(4, 1, 0), 1.0});
 
     cam.aspect_ratio      = 16.0 / 9.0;
     cam.image_width       = 400;

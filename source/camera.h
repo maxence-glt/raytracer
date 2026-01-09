@@ -3,6 +3,7 @@
 
 #include "hittable.h"
 #include "material.h"
+#include "sphere.h"
 #include "util/profiler.hpp"
 #include "util/vecmath.hpp"
 #include "util/timing.hpp"
@@ -94,7 +95,26 @@ struct camera {
         return Ray(ray_origin, ray_dir);
     }
 
-    color ray_color(const Ray &r0, const hittable &world) const {
+    bool camera_hit(const Ray &r, const interval &ray_t, hit_record &rec, const Spheres &spheres) const {
+        hit_record temp_rec;
+        bool hit_anything = false;
+        auto closest_so_far = ray_t.max;
+        DCHECK_EQ(spheres.centers.size(), spheres.materials.size());
+
+        for (int i = 0; i < spheres.centers.size(); ++i) {
+            auto sphere = spheres.centers[i];
+            if (hit(spheres.centers[i], r, interval(ray_t.min, closest_so_far), temp_rec)) {
+                temp_rec.mat = spheres.materials[i];
+                hit_anything = true;
+                closest_so_far = temp_rec.t;
+                rec = temp_rec;
+            }
+        }
+
+        return hit_anything;
+    }
+
+    color ray_color(const Ray &r0, const Spheres &world) const {
         PROFILE_SCOPE("ray_color");
         Ray r = r0;
         color throughput(1.0, 1.0, 1.0);
@@ -102,7 +122,7 @@ struct camera {
         for (int depth = 0; depth < max_depth; ++depth) {
             hit_record rec;
             auto s = sample_start("ray_color::hit");
-            if (!world.hit(r, interval(0.001, infinity), rec))
+            if (!camera_hit(r, interval(0.001, infinity), rec, world))
                 break;
             sample_end(s.release());
 
@@ -121,7 +141,6 @@ struct camera {
 
         return lerp * throughput;
     }
-
 
     Vector3f sample_square() const {
         return Vector3f(Rand::random<Float>() - 0.5, Rand::random<Float>() - 0.5, 0);
