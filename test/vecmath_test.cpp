@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 #include <type_traits>
 
-#include "../util/vecmath.hpp"
-#include "../raytracer.hpp"
+#include "util/vecmath.hpp"
+#include "raytracer.hpp"
 
 TEST(Vector3, Basics) {
     Vector3f vf(-1, 10, 2);

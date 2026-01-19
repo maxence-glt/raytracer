@@ -37,7 +37,7 @@ using SampleHandle = std::unique_ptr<Sample, decltype(sampleDeleter)>;
 
 class Profiler {
 public:
-    Profiler() { init(); }
+    Profiler() { }
 
     void init() {
         profiling = true;

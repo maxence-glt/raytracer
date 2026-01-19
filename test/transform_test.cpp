@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "../util/math.hpp"
-#include "../util/transform.hpp"
+#include "util/math.hpp"
+#include "util/transform.hpp"
 
 constexpr Float kEps = static_cast<Float>(1e-5);
 constexpr Float kEpsLoose = static_cast<Float>(1e-4);
