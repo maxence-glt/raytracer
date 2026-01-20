@@ -5,6 +5,8 @@
 #include "util/profiler.hpp"
 #include "raytracer.hpp"
 
+#include <OpenImageIO/imageio.h>
+
 using color = Vector3f;
 
 inline Float linear_to_gamma(Float linear_component) {
@@ -12,7 +14,7 @@ inline Float linear_to_gamma(Float linear_component) {
     return 0;
 }
 
-inline void write_color(std::ostream &out, const color &pixel_color) {
+inline void write_color(std::vector<float> &out, const color &pixel_color, int index) {
     PROFILE_SCOPE("write_color");
     auto r = pixel_color[0];
     auto g = pixel_color[1];
@@ -23,9 +25,11 @@ inline void write_color(std::ostream &out, const color &pixel_color) {
     b = linear_to_gamma(b);
 
     static const interval intensity(0.000, 0.999);
-    int rbyte = int(256 * intensity.clamp(r));
-    int gbyte = int(256 * intensity.clamp(g));
-    int bbyte = int(256 * intensity.clamp(b));
+    float rbyte = intensity.clamp(r);
+    float gbyte = intensity.clamp(g);
+    float bbyte = intensity.clamp(b);
 
-    out << rbyte << ' ' << gbyte << ' ' << bbyte << '\n';
+    out[index + 0] = rbyte;
+    out[index + 1] = gbyte;
+    out[index + 2] = bbyte;
 }

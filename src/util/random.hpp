@@ -2,11 +2,12 @@
 
 #include <cstdint>
 #include <type_traits>
+#include "options.hpp"
 
 namespace Rand {
 
 inline uint64_t& state() {
-    static thread_local uint64_t s = 0xDEADBEEF;
+    static thread_local uint64_t s = Options->seed;
     return s;
 }
 

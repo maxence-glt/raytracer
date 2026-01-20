@@ -15,9 +15,17 @@ set(CORE_SRCS
     src/util/profiler.cpp
     src/util/transform.cpp
     src/render/render.cpp
+    src/raytracer.cpp
 )
 
 add_library(raytracer_core STATIC ${CORE_SRCS})
+
+# ---- OpenImageIO ----
+set(OpenImageIO_ROOT "${CMAKE_SOURCE_DIR}/import/OpenImageIO-3.1.9.0/install")
+list(PREPEND CMAKE_PREFIX_PATH "${OpenImageIO_ROOT}")
+
+find_package(OpenImageIO CONFIG REQUIRED)
+target_link_libraries(raytracer_core PUBLIC OpenImageIO::OpenImageIO)
 
 target_include_directories(raytracer_core PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -76,7 +84,11 @@ if(ENABLE_SANITIZERS)
 endif()
 
 # critical, stable dependencies
-# add OIIO
+set(OpenImageIO_ROOT "${CMAKE_SOURCE_DIR}/import/OpenImageIO-3.1.9.0/install")
+list(PREPEND CMAKE_PREFIX_PATH "${OpenImageIO_ROOT}")
+find_package(OpenImageIO CONFIG REQUIRED)
+
+target_link_libraries(raytracer_core PUBLIC OpenImageIO::OpenImageIO)
 
 # development/testing dependencies
 if(BUILD_TESTS)
@@ -85,9 +97,15 @@ if(BUILD_TESTS)
 
     file(GLOB_RECURSE TEST_SRCS CONFIGURE_DEPENDS test/*.cpp)
 
-    add_executable(tests ${TEST_SRCS})
+    add_executable(tests EXCLUDE_FROM_ALL ${TEST_SRCS})
     target_link_libraries(tests PRIVATE raytracer_core GTest::gtest_main)
 
     include(GoogleTest)
     gtest_discover_tests(tests)
 endif()
+
+target_compile_options(raytracer PRIVATE
+  -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/=
+  -fmacro-prefix-map=${CMAKE_BINARY_DIR}/=
+)
+

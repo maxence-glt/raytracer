@@ -31,3 +31,6 @@ using Normal3f = Normal3<Float>;
 using Normal3i = Normal3<int>;
 
 using Bounds3f = Bounds3<Float>;
+
+void init();
+void cleanup();

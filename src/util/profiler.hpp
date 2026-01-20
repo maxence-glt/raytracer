@@ -8,6 +8,7 @@
 #include <string_view>
 #include <vector>
 
+#include "options.hpp"
 #include "timing.hpp"
 
 struct Sample {
@@ -37,7 +38,7 @@ using SampleHandle = std::unique_ptr<Sample, decltype(sampleDeleter)>;
 
 class Profiler {
 public:
-    Profiler() { }
+    Profiler() {}
 
     void init() {
         profiling = true;
@@ -48,10 +49,10 @@ public:
         stack.push_back(0);
     }
 
-    void shutdown() { profiling = false; }
+    void shutdown() { Options->profiling = false; }
     void print(bool sortByTime = false);
 
-    bool profiling = false;
+    bool profiling;
 
 private:
     friend SampleHandle sample_start(std::string_view sampleName);

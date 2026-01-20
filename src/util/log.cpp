@@ -1,5 +1,6 @@
 #include "log.hpp"
 #include "error.hpp"
+#include "options.hpp"
 #include "timing.hpp"
 #include <cstdio>
 #include <exception>
@@ -15,12 +16,14 @@ float elapsedSeconds() {
 }
 
 namespace logging {
-LogLevel logLevel = LogLevel::Error;
+LogLevel logLevel;
 FILE *logFile;
 } // namespace logging
 
-void initLogging(std::string logFile, LogLevel level) {
-    logging::logLevel = level;
+void initLogging() {
+    logging::logLevel = Options->logLevel;
+    auto logFile = Options->logFile;
+
     if (!logFile.empty()) {
         logFile = "../logs/" + logFile + ".log";
         logging::logFile = fopen(logFile.c_str(), "ab");
@@ -31,7 +34,7 @@ void initLogging(std::string logFile, LogLevel level) {
         logging::logLevel = LogLevel::Verbose;
     }
 
-    if (level == LogLevel::Invalid) {
+    if (logging::logLevel == LogLevel::Invalid) {
         std::print("Invalid --log-level specified.");
         std::terminate();
     }

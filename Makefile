@@ -18,6 +18,8 @@ configure-debug:
 
 build-release: configure-release
 	cmake --build build/release -j
+	rm compile_commands.json
+	mv build/release/compile_commands.json .
 
 build-debug: configure-debug
 	cmake --build build/debug -j
@@ -25,10 +27,10 @@ build-debug: configure-debug
 run: build-release
 	./build/release/raytracer $(ARGS)
 
-OUT ?= image.ppm
+OUT ?= image.exr
 render: build-release
-	./build/release/raytracer $(ARGS) > images/"$(OUT)"
-	kitten icat images/"$(OUT)"
+	./build/release/raytracer
+	kitten icat "$(OUT)"
 
 debug: build-debug
 	./build/debug/raytracer_debug $(ARGS)
