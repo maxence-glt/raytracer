@@ -51,3 +51,4 @@ tests
 source/.cache/
 source/compile_commands.json
 build/
+.cache/

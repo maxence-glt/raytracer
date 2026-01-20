@@ -1,20 +1,13 @@
 #include "render.hpp"
+#include "util/log.hpp"
 #include <OpenImageIO/imageio.h>
+#include <cstddef>
 #include <syncstream>
 
 using namespace OIIO;
 
-inline int idx(int x, int y, int c, int W, int C) {
-    return (y * W + x) * C + c;
-}
-
-struct Tile {
-    int x0, y0;
-    int x1, y1;
-};
-
-std::vector<Tile> makeTiles(int W, int H, int TILE) {
-    std::vector<Tile> tiles;
+std::vector<Bounds2<int>> makeTiles(int W, int H, int TILE) {
+    std::vector<Bounds2<int>> tiles;
     int tilesX = (W + TILE - 1) / TILE;
     int tilesY = (H + TILE - 1) / TILE;
 
@@ -26,23 +19,23 @@ std::vector<Tile> makeTiles(int W, int H, int TILE) {
             int y0 = ty * TILE;
             int x1 = std::min(x0 + TILE, W);
             int y1 = std::min(y0 + TILE, H);
-            tiles.push_back({x0, y0, x1, y1});
+            tiles.push_back({Point2<int>(x0, y0), Point2<int>(x1, y1)});
         }
     }
     return tiles;
 }
 
-void renderThread(const Scene &scene, const Tile &t, int W, int H, int C, std::vector<float> &film) {
+void renderThread(const Scene &scene, const Bounds2<int> &t, int W, int H, int C, std::vector<float> &film) {
     auto cam = scene.camera;
 
-    for (int y = t.y0; y < t.y1; ++y) {
-        for (int x = t.x0; x < t.x1; ++x) {
+    for (int y = t[0].y; y < t[1].y; ++y) {
+        for (int x = t[0].x; x < t[1].x; ++x) {
             color pixel_color(0, 0, 0);
             for (int sample = 0; sample < cam.samples_per_pixel; ++sample) {
                 Ray r = cam.get_ray(x, y);
                 pixel_color += cam.ray_color(r, scene.world);
             }
-            write_color(film, cam.pixel_samples_scale*pixel_color, idx(x, y, 0, W, C));
+            write_color(film, cam.pixel_samples_scale*pixel_color, (y*W+x) * C);
         }
     }
 }
@@ -61,18 +54,18 @@ void render(const Scene &scene) {
 
     std::vector<float> pixels(xres * yres * channels);
 
-    auto t1 = curr_time();
-
     auto tiles = makeTiles(xres, yres, 32);
-    std::atomic<int> nextTile{0},tilesLeft{(int)tiles.size()};
+    std::atomic<std::size_t> nextTile{0},tilesLeft{tiles.size()};
     std::vector<std::thread> threads;
     threads.reserve(Options->nThreads);
+
+    auto t1 = curr_time();
 
     for (int t = 0; t < Options->nThreads; ++t) {
         threads.emplace_back([&](){
             while (true) {
                 int i = nextTile.fetch_add(1);
-                if (i >= (int)tiles.size()) break;
+                if (i >= tiles.size()) break;
                 renderThread(scene, tiles[i], xres, yres, channels, pixels);
 
                 int left = tilesLeft.fetch_sub(1, std::memory_order_relaxed) - 1;

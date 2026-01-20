@@ -27,7 +27,7 @@ public:
     bool hasNaN() const { return isnan(x) || isnan(y); }
 
     Tuple2(Child<T> c) {
-        DCHECK(!c.HasNaN());
+        DCHECK(!c.hasNaN());
         x = c.x;
         y = c.y;
     }
@@ -106,7 +106,7 @@ public:
         return (i == 0) ? x : y;
     }
 
-    std::string toString() const { return std::format("[ {}, {}, {} ]", x, y); }
+    std::string toString() const { return std::format("[ {}, {} ]", x, y); }
 
     T x{}, y{};
 };
@@ -728,6 +728,37 @@ inline auto absDot(const Normal3<T> &n1, const Normal3<T> &n2) {
     using std::abs;
     return abs(dot(n1, n2));
 }
+
+
+template <typename T>
+class Bounds2 {
+public:
+    Bounds2() {
+        T minNum = std::numeric_limits<T>::lowest();
+        T maxNum = std::numeric_limits<T>::max();
+        pMin = Point2<T>(maxNum, maxNum);
+        pMax = Point2<T>(minNum, minNum);
+    }
+
+    explicit Bounds2(Point3<T> p) : pMin(p), pMax(p) {}
+
+    Bounds2(Point2<T> p1, Point2<T> p2) : pMin(min(p1, p2)), pMax(max(p1, p2)) {}
+
+    Point2<T> operator[](int i) const {
+        DCHECK(i == 0 || i == 1);
+        return (i == 0) ? pMin : pMax;
+    }
+    Point2<T> &operator[](int i) {
+        DCHECK(i == 0 || i == 1);
+        return (i == 0) ? pMin : pMax;
+    }
+
+    std::string toString() const { 
+        return std::format("[ {} - {} ]", pMin.toString(), pMax.toString());
+    }
+
+    Point2<T> pMin, pMax;
+};
 
 template <typename T>
 class Bounds3 {
